@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/retry.dart';
 import 'package:whatsappcentral/components/contact_form.dart';
 import 'package:whatsappcentral/components/contact_item.dart';
+import 'package:whatsappcentral/components/controlaUsuario.dart';
 import 'package:whatsappcentral/models/contact.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -20,6 +21,7 @@ class _ListContactsState extends State<ListContacts> {
   final String url = "http://192.168.10.101:3001/contatos/";
   String filter = "";
   bool allOk = false;
+  Future<List<Contact>>? lista;
 
   @override
   void initState() {
@@ -28,7 +30,12 @@ class _ListContactsState extends State<ListContacts> {
   }
 
   Future<bool> _list({String id = ""}) async {
+    String token = "";
     final response = await http.get(Uri.parse(url + "${id}"));
+
+    ControlaUsuario conexao = ControlaUsuario();
+
+    token = await conexao.conectaProtheus();
 
     allOk = response.statusCode == 200;
 
