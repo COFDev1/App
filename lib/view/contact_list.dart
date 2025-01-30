@@ -1,54 +1,64 @@
 import 'dart:ffi';
 import 'package:flutter/material.dart';
-import 'package:http/retry.dart';
 import 'package:whatsappcentral/components/contact_form.dart';
 import 'package:whatsappcentral/components/contact_item.dart';
 import 'package:whatsappcentral/components/controlaUsuario.dart';
+import 'package:whatsappcentral/models/autenticacao.dart';
 import 'package:whatsappcentral/models/contact.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ListContacts extends StatefulWidget {
   List<Contact> lista = [];
+  String cCustomer = "";
 
-  ListContacts({required this.lista, super.key});
+  ListContacts({required this.lista, required this.cCustomer, super.key});
 
   @override
   State<ListContacts> createState() => _ListContactsState();
 }
 
 class _ListContactsState extends State<ListContacts> {
-  final String url = "http://192.168.10.101:3001/contatos/";
+  final String url = Autenticacao.urlContacts;
+  late String id = widget.cCustomer;
   String filter = "";
+  String token =
+      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InBKd3RQdWJsaWNLZXlGb3IyNTYifQ.eyJpc3MiOiJUT1RWUy1BRFZQTC1GV0pXVCIsInN1YiI6Implc3NlIiwiaWF0IjoxNzM4MjYyNjA4LCJ1c2VyaWQiOiIwMDAwNjEiLCJleHAiOjE3MzgyNjYyMDgsImVudklkIjoiUDEyXzMzX0hPTSJ9.opwj91vhDdLpLwxfuf8BpkMe9i0koLMXpV40OAqAwsZrporEO82Y4yRl-6LP49hGKvw6r2sZqtI6wZQN8iNeegKLnZ-ZVBa_uDX-RfHTGG_ErYhMZoHNCCp_ZMbJ_D4P_db5_eo5sE6QLN_ePd56t8HYcqRzPngydYV7ubt_5_SzeV1IOSFIhLiYzUej2vZI02DUII3Xb2LAy4u11pfs-0Hc48YiXYScne23fZGqTF0hINqi-HT4ofHvDWXPQQRRrhYzF3-D5N8nv7aG_2E6KmrHxKVRJh7yRRK6oICHhkfNtRsUntjAb9tCNkGSdWuH1JhuJnrVYPGN3KLFj3Jr5w";
+
   bool allOk = false;
-  Future<List<Contact>>? lista;
 
   @override
   void initState() {
     super.initState();
-    _list();
+    print("Codigo do cliente recebido :  ${widget.cCustomer}");
+    _list(id: widget.cCustomer);
   }
 
   Future<bool> _list({String id = ""}) async {
-    String token = "";
-    final response = await http.get(Uri.parse(url + "${id}"));
+    String data = "";
 
-    ControlaUsuario conexao = ControlaUsuario();
+    if (token.isNotEmpty) {
+      List newList = [];
 
-    token = await conexao.conectaProtheus();
+      Map<String, String> request = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token'
+      };
 
-    allOk = response.statusCode == 200;
+      final response = await http
+          .get(
+        Uri.parse(url + "${id}"),
+        headers: request,
+      )
+          .then((value) {
+        print("Retorno:....${value.body}");
 
-    if (allOk) {
-      final List newList;
-
-      final data = jsonDecode(response.body);
-
-      newList = data is Map ? [jsonDecode(response.body)] : data;
+        newList = [jsonDecode(value.body)];
+      });
 
       widget.lista = [];
 
-      newList.forEach((element) {
+      newList[0]["items"].forEach((element) {
         widget.lista.add(
           Contact(
               id: element["id"],
@@ -162,7 +172,10 @@ class _ListContactsState extends State<ListContacts> {
   }
 
   void _updateContact(
-      Map<String, dynamic> details, int operation, BuildContext context) {
+    Map<String, dynamic> details,
+    int operation,
+    BuildContext context,
+  ) {
     final String id =
         details["index"] != -1 ? widget.lista[details["index"]].id : "";
 

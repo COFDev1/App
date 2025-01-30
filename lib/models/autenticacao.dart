@@ -7,4 +7,5 @@ class Autenticacao {
       "api/oauth2/v1/token?grant_type=password&password=${senha}&username=${usuario}";
   static const urlSeller = urlBase + "app/customers/auth/";
   static const urlCustomers = urlBase + "app/customers/";
+  static const urlContacts = urlBase + "app/contacts/";
 }

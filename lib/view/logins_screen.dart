@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:whatsappcentral/view/contact_list.dart';
+import 'package:whatsappcentral/view/teste.dart';
 import '../components/controlaUsuario.dart';
 import '../models/autenticacao.dart';
 import 'package:http/http.dart' as http;
@@ -82,10 +84,8 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => ListCustomers(
-            token: token,
-            sales: seller,
-          ),
+          // builder: (_) => MyWidget(),
+          builder: (_) => ListCustomers(token: token, sales: seller),
         ),
       );
     } else {

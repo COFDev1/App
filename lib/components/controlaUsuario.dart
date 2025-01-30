@@ -5,9 +5,7 @@ import 'dart:convert';
 
 class ControlaUsuario {
   Future<String> conectaProtheus() async {
-    var response = await http
-        .post(Uri.parse(Autenticacao.urlLogin))
-        .timeout(const Duration(seconds: 3));
+    var response = await http.post(Uri.parse(Autenticacao.urlLogin));
 
     try {
       if (response.statusCode == 201) {

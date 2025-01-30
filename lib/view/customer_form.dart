@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:whatsappcentral/utils/app_routes.dart';
+import 'package:whatsappcentral/view/contact_list.dart';
 
 enum FilterOptions {
   add_contact,
@@ -69,7 +70,13 @@ class _CustomerFormState extends State<CustomerForm> {
             ),
           ],
           onSelected: (_) {
-            Navigator.of(context).pushNamed(AppRoutes.listContact);
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                  builder: (context) => ListContacts(
+                        lista: [],
+                        cCustomer: widget.customer.id,
+                      )),
+            );
           },
         )
       ],

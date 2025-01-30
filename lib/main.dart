@@ -21,7 +21,8 @@ class MyApp extends StatelessWidget {
         ),
         home: LoginPage(), // ListCustomers()
         routes: {
-          AppRoutes.listContact: (ctx) => ListContacts(lista: []),
+          // AppRoutes.listContact: (ctx) =>
+          //     ListContacts(lista: [], cCustomer: ""),
         },
         debugShowCheckedModeBanner: false);
   }
