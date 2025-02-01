@@ -1,8 +1,6 @@
-import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:whatsappcentral/components/contact_form.dart';
 import 'package:whatsappcentral/components/contact_item.dart';
-import 'package:whatsappcentral/components/controlaUsuario.dart';
 import 'package:whatsappcentral/models/autenticacao.dart';
 import 'package:whatsappcentral/models/contact.dart';
 import 'package:http/http.dart' as http;
@@ -19,13 +17,12 @@ class ListContacts extends StatefulWidget {
 }
 
 class _ListContactsState extends State<ListContacts> {
+  String filter = "";
+  bool allOk = false;
+
   final String url = Autenticacao.urlContacts;
   late String id = widget.cCustomer;
-  String filter = "";
-  String token =
-      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InBKd3RQdWJsaWNLZXlGb3IyNTYifQ.eyJpc3MiOiJUT1RWUy1BRFZQTC1GV0pXVCIsInN1YiI6Implc3NlIiwiaWF0IjoxNzM4MjYyNjA4LCJ1c2VyaWQiOiIwMDAwNjEiLCJleHAiOjE3MzgyNjYyMDgsImVudklkIjoiUDEyXzMzX0hPTSJ9.opwj91vhDdLpLwxfuf8BpkMe9i0koLMXpV40OAqAwsZrporEO82Y4yRl-6LP49hGKvw6r2sZqtI6wZQN8iNeegKLnZ-ZVBa_uDX-RfHTGG_ErYhMZoHNCCp_ZMbJ_D4P_db5_eo5sE6QLN_ePd56t8HYcqRzPngydYV7ubt_5_SzeV1IOSFIhLiYzUej2vZI02DUII3Xb2LAy4u11pfs-0Hc48YiXYScne23fZGqTF0hINqi-HT4ofHvDWXPQQRRrhYzF3-D5N8nv7aG_2E6KmrHxKVRJh7yRRK6oICHhkfNtRsUntjAb9tCNkGSdWuH1JhuJnrVYPGN3KLFj3Jr5w";
-
-  bool allOk = false;
+  late var request = setHeader();
 
   @override
   void initState() {
@@ -34,48 +31,57 @@ class _ListContactsState extends State<ListContacts> {
     _list(id: widget.cCustomer);
   }
 
+  Map<String, String> setHeader() {
+    Map<String, String> header = {};
+    String token = "";
+
+    token =
+        "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InBKd3RQdWJsaWNLZXlGb3IyNTYifQ.eyJpc3MiOiJUT1RWUy1BRFZQTC1GV0pXVCIsInN1YiI6Implc3NlIiwiaWF0IjoxNzM4NDI5ODg4LCJ1c2VyaWQiOiIwMDAwNjEiLCJleHAiOjE3Mzg0MzM0ODgsImVudklkIjoiUDEyXzMzX0hPTSJ9.VZ3XiaNDFX_KT8JTs4gydn70S96DMUoXoRZBVLfNfhnECQrBh6b4a6LLx1Qx2DKsurcJ83Qk607JnZ1ABZx_nsZK_2xiG2oWEiEANVIXgyPQrgZK2xb0HKJs-cLTonsPgR0KYmETjeLiF1HX-oXTlLrMmRWIlcqSJVdK73L7qe6EyVJrplAGC8KzNnEp82krCVVKfGOv1S93dPXIcH2PXpnu-BOjpKarLq84RyG0lH-ZQR-eh9K_5gzBrqq7Trf51eRiM8lKImlChvl_M0J_nvQc8c6uo2UFNNl4lskSJ3RWa0LRYVbCLSRvC8ppWn8GGJuGOsm_lFXhYYlkfwZMRA";
+    header["Content-Type"] = "application/json";
+    header["Authorization"] = "Bearer $token";
+
+    return header;
+  }
+
   Future<bool> _list({String id = ""}) async {
-    String data = "";
+    List newList = [];
 
-    if (token.isNotEmpty) {
-      List newList = [];
+    final response = await http
+        .get(Uri.parse(url + "${id}"), headers: request)
+        .then((value) {
+      print("Retorno:....${value.body}");
 
-      Map<String, String> request = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token'
-      };
+      newList = [jsonDecode(value.body)];
+    });
 
-      final response = await http
-          .get(
-        Uri.parse(url + "${id}"),
-        headers: request,
-      )
-          .then((value) {
-        print("Retorno:....${value.body}");
+    widget.lista = [];
 
-        newList = [jsonDecode(value.body)];
-      });
-
-      widget.lista = [];
-
-      newList[0]["items"].forEach((element) {
-        widget.lista.add(
-          Contact(
-              id: element["id"],
-              name: element["name"],
-              phone: element["phone"],
-              type: element["tipo"],
-              description: element["descricao"]),
-        );
-      });
-      setState(() {});
-    }
+    newList[0]["items"].forEach((element) {
+      widget.lista.add(Contact(
+        id: element["id"],
+        name: element["name"],
+        phone: element["phone"],
+        type: element["tipo"],
+        description: element["descricao"],
+        idac8: element["recac8"],
+        idagb: element["recagb"],
+        idsa1: element["recsa1"],
+        idsu5: element["recsu5"],
+      ));
+      print("Valor retornado ${element["recsu5"]} ");
+    });
+    setState(() {});
+    // }
     return allOk;
   }
 
   Future<void> _add(
       {Map<String, dynamic>? contact, Contact? newContact}) async {
-    var response = await http.post(Uri.parse(url), body: jsonEncode(contact));
+    var response = await http.post(
+      Uri.parse(url + "${id}"),
+      headers: request,
+      body: jsonEncode(contact),
+    );
 
     allOk = response.statusCode == 200 || response.statusCode == 201;
 
@@ -96,8 +102,11 @@ class _ListContactsState extends State<ListContacts> {
       {Map<String, dynamic>? contact,
       Contact? newContact,
       String id = ""}) async {
-    var response =
-        await http.put(Uri.parse(url + "$id"), body: jsonEncode(contact));
+    var response = await http.put(
+      Uri.parse(url + "$id"),
+      headers: request,
+      body: jsonEncode(contact),
+    );
 
     allOk = response.statusCode == 200 || response.statusCode == 201;
 
@@ -112,8 +121,21 @@ class _ListContactsState extends State<ListContacts> {
     }
   }
 
-  Future<void> _delete({String id = ""}) async {
-    final response = await http.delete(Uri.parse(url + "${id}"));
+  Future<void> _delete({int recsu5 = 0, recagb = 0}) async {
+    Map<String, int> body = {};
+
+    body["recsu5"] = recsu5;
+    body["recagb"] = recagb;
+
+    final response = await http
+        .delete(
+      Uri.parse(url + "${id}"),
+      headers: request,
+      body: jsonEncode(body),
+    )
+        .then((value) {
+      print("Retorno:....${value.body}");
+    });
 
     allOk = response.statusCode == 200;
 
@@ -181,24 +203,28 @@ class _ListContactsState extends State<ListContacts> {
 
     details.remove("index");
 
+    final Contact newContact = Contact(
+      id: id,
+      name: details["name"],
+      phone: details["phone"],
+      type: details["tipo"],
+      description: details["descricao"],
+      idac8: details["recac8"],
+      idagb: details["recagb"],
+      idsa1: details["recsa1"],
+      idsu5: details["recsu5"],
+    );
+
     switch (operation) {
       case 3:
       case 4:
-        final Contact newContact = Contact(
-          id: id,
-          name: details["name"],
-          phone: details["phone"],
-          type: details["tipo"],
-          description: details["descricao"],
-        );
-
         operation == 3
             ? _add(contact: details, newContact: newContact)
             : _edit(contact: details, newContact: newContact, id: id);
         break;
 
       case 5:
-        _delete(id: id);
+        _delete(recsu5: newContact.idsu5, recagb: newContact.idagb);
 
         break;
       default:
@@ -215,7 +241,6 @@ class _ListContactsState extends State<ListContacts> {
 
   _openContactFormModal(BuildContext? context,
       [String id = "", int index = -1, int operation = 3]) {
-    // final List<Contact> result = id.isEmpty ? [] : [widget.lista[index]];
     final List<Contact> result = index != -1 ? [widget.lista[index]] : [];
 
     showModalBottomSheet(

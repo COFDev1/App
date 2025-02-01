@@ -160,7 +160,7 @@ class _ListCustomersState extends State<ListCustomers> {
                           ),
                         ),
                         SizedBox(
-                          height: availableHeight * 0.85,
+                          height: availableHeight * 0.80,
                           child: InkWell(
                             child: CustomItem(listCustomer: listCustomers),
                           ),

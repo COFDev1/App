@@ -84,7 +84,6 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          // builder: (_) => MyWidget(),
           builder: (_) => ListCustomers(token: token, sales: seller),
         ),
       );

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:whatsappcentral/models/customer.dart';
-
+import 'package:whatsappcentral/view/contact_list.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-import 'package:whatsappcentral/utils/app_routes.dart';
-import 'package:whatsappcentral/view/contact_list.dart';
 
 enum FilterOptions {
   add_contact,

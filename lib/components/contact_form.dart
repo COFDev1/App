@@ -66,11 +66,14 @@ class _ContactFormState extends State<ContactForm> {
   List<String> loadOptionions() {
     List<String> options = <String>[
       "Tipo de Contato",
-      "WhatsApp",
-      "Celular",
-      "Comercial",
-      "Residencial"
+      "1 - Comercial",
+      "2 - Residencial",
+      "3 - Celular",
+      "4 - WhatsApp",
+      "5 - Fax comercial",
     ];
+
+    // =Comercial;2=Residencial;3=Fax comercial;4=Fax residencial;5=Celular
     return options;
   }
 
@@ -237,6 +240,14 @@ class _ContactFormState extends State<ContactForm> {
                         detail["tipo"] = dropdownValue;
                         detail["descricao"] =
                             _descriptionContactController.text;
+                        detail["recac8"] =
+                            _lEdit ? 0 : widget.listContact![0].idac8;
+                        detail["recagb"] =
+                            _lEdit ? 0 : widget.listContact![0].idagb;
+                        detail["recsa1"] =
+                            _lEdit ? 0 : widget.listContact![0].idsa1;
+                        detail["recsu5"] =
+                            _lEdit ? 0 : widget.listContact![0].idsu5;
 
                         _submitForm(detail);
                       },
