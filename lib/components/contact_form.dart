@@ -162,17 +162,24 @@ class _ContactFormState extends State<ContactForm> {
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp('[0-9]')),
                   ],
-                  maxLength: 11,
+                  maxLength:
+                      dropdownValue.contains("3") || dropdownValue.contains("4")
+                          ? 11
+                          : 10,
                   keyboardType: TextInputType.phone,
                   validator: (value) {
                     final phone = value ?? '';
+                    int maxLim = dropdownValue.contains("3") ||
+                            dropdownValue.contains("4")
+                        ? 11
+                        : 10;
 
                     if ((phone.trim().isEmpty) && (_addEdit)) {
                       return "Telefone é obrigatório.";
                     }
 
-                    if ((phone.trim().length < 11) && (_addEdit)) {
-                      return "Telefone deve ter 11 dígitos.";
+                    if ((phone.trim().length < maxLim) && (_addEdit)) {
+                      return "Telefone deve ter $maxLim dígitos.";
                     }
                     return null;
                   },
