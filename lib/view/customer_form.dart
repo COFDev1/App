@@ -91,7 +91,7 @@ class _CustomerFormState extends State<CustomerForm> {
             child: Column(
               children: [
                 SizedBox(
-                  height: availableHeight * 0.90,
+                  height: availableHeight * 0.85,
                   child: SingleChildScrollView(
                     child: Column(
                       children: [

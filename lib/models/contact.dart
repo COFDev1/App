@@ -5,10 +5,10 @@ class Contact {
   final String type;
   final String description;
 
-  int idac8;
-  int idagb;
-  int idsa1;
-  int idsu5;
+  final int idac8;
+  final int idagb;
+  final int idsa1;
+  final int idsu5;
 
   Contact({
     required this.id,
@@ -21,4 +21,15 @@ class Contact {
     this.idsa1 = 0,
     this.idsu5 = 0,
   });
+
+  Contact.fromJson(Map<String, dynamic> json)
+      : id = json["id"],
+        name = json["name"],
+        phone = json["phone"],
+        type = json["tipo"],
+        description = json["descricao"],
+        idac8 = json["recac8"],
+        idagb = json["recagb"],
+        idsa1 = json["recsa1"],
+        idsu5 = json["recsu5"];
 }

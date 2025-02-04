@@ -24,11 +24,14 @@ class _ListContactsState extends State<ListContacts> {
   late String id = widget.cCustomer;
   late var request = setHeader();
 
+  Future<List<Contact>>? futureContacts;
+
   @override
   void initState() {
     super.initState();
     print("Codigo do cliente recebido :  ${widget.cCustomer}");
-    _list(id: widget.cCustomer);
+    futureContacts = _list(id: widget.cCustomer);
+    print("Valor retornado: $futureContacts");
   }
 
   Map<String, String> setHeader() {
@@ -36,43 +39,52 @@ class _ListContactsState extends State<ListContacts> {
     String token = "";
 
     token =
-        "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InBKd3RQdWJsaWNLZXlGb3IyNTYifQ.eyJpc3MiOiJUT1RWUy1BRFZQTC1GV0pXVCIsInN1YiI6Implc3NlIiwiaWF0IjoxNzM4NDI5ODg4LCJ1c2VyaWQiOiIwMDAwNjEiLCJleHAiOjE3Mzg0MzM0ODgsImVudklkIjoiUDEyXzMzX0hPTSJ9.VZ3XiaNDFX_KT8JTs4gydn70S96DMUoXoRZBVLfNfhnECQrBh6b4a6LLx1Qx2DKsurcJ83Qk607JnZ1ABZx_nsZK_2xiG2oWEiEANVIXgyPQrgZK2xb0HKJs-cLTonsPgR0KYmETjeLiF1HX-oXTlLrMmRWIlcqSJVdK73L7qe6EyVJrplAGC8KzNnEp82krCVVKfGOv1S93dPXIcH2PXpnu-BOjpKarLq84RyG0lH-ZQR-eh9K_5gzBrqq7Trf51eRiM8lKImlChvl_M0J_nvQc8c6uo2UFNNl4lskSJ3RWa0LRYVbCLSRvC8ppWn8GGJuGOsm_lFXhYYlkfwZMRA";
+        "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InBKd3RQdWJsaWNLZXlGb3IyNTYifQ.eyJpc3MiOiJUT1RWUy1BRFZQTC1GV0pXVCIsInN1YiI6Implc3NlIiwiaWF0IjoxNzM4NjkzNzI4LCJ1c2VyaWQiOiIwMDAwNjEiLCJleHAiOjE3Mzg2OTczMjgsImVudklkIjoiUDEyXzMzX0hPTSJ9.TQ8l7EpHJyWVlE3WPAQKE9tlN-CiOTw8l19BSqOBPVVoAuW2PNLFZmt4HQma0cLug7ZhcGNchsQ9vvQH2H61_tEEMCRPLI0FGmhiIoybmxtNb1j5jgBbYtSM8Z2-__aAPAv5Xz9S24ms-mjatGCXEqHK4Zangx4YWriWZQeHFfjyrkGsjogIY4o9Ah17Sa2PaN9zD-Um_NP78F_WUSUfvun-Yx4GE2STqkZYAxTqq2re6ZYHNYN6CtiUr1q8YMorwVv55x4b3JOY-RRvhrbs9MDvdUoYbzCdJWxkYleKYqbeGGIVz2RGIR2aZpePnqrJpz8D56IQaIrrNGWQK_F4gw";
     header["Content-Type"] = "application/json";
     header["Authorization"] = "Bearer $token";
 
     return header;
   }
 
-  Future<bool> _list({String id = ""}) async {
+  Future<List<Contact>> _list({String id = ""}) async {
     List newList = [];
 
-    final response = await http
-        .get(Uri.parse(url + "${id}"), headers: request)
-        .then((value) {
-      print("Retorno:....${value.body}");
-
-      newList = [jsonDecode(value.body)];
-    });
+    final response = await http.get(Uri.parse(url + "${id}"), headers: request);
 
     widget.lista = [];
 
-    newList[0]["items"].forEach((element) {
-      widget.lista.add(Contact(
-        id: element["id"],
-        name: element["name"],
-        phone: element["phone"],
-        type: element["tipo"],
-        description: element["descricao"],
-        idac8: element["recac8"],
-        idagb: element["recagb"],
-        idsa1: element["recsa1"],
-        idsu5: element["recsu5"],
-      ));
-      print("Valor retornado ${element["recsu5"]} ");
-    });
-    setState(() {});
+    // if (response.statusCode == 200) {
+    //   newList = [jsonDecode(response.body)];
+
+    //   newList[0]["items"].forEach((element) {
+    //     widget.lista.add(Contact(
+    //       id: element["id"],
+    //       name: element["name"],
+    //       phone: element["phone"],
+    //       type: element["tipo"],
+    //       description: element["descricao"],
+    //       idac8: element["recac8"],
+    //       idagb: element["recagb"],
+    //       idsa1: element["recsa1"],
+    //       idsu5: element["recsu5"],
+    //     ));
+    //   });
+    //   print("Lista retornada: ${widget.lista}");
+    //   return widget.lista;
+    // } else {
+    //   return Future.error("Ops! Um erro ocorreu.");
     // }
-    return allOk;
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body)["items"];
+
+      return List<Contact>.from(json.map((elemento) {
+        print("Elemento $elemento");
+        return Contact.fromJson(elemento);
+      })).toList();
+    } else {
+      return Future.error("Erro ao conectar com a Api");
+    }
   }
 
   Future<void> _add(
@@ -276,31 +288,33 @@ class _ListContactsState extends State<ListContacts> {
         appBar: AppBar(
           title: const Text("Meus Contatos"),
         ),
-        body: widget.lista.isEmpty
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const FittedBox(
-                      child: Text(
-                        "Não há contatos a serem exibidos",
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            : SizedBox(
-                height: availableHeight * 0.8,
-                child: ContactItem(
-                  listContact: widget.lista,
-                  onRemove: _removeContact,
-                  onOpenForm: _openContactFormModal,
-                ),
-              ),
+        body: SizedBox(
+            height: availableHeight * 0.8,
+            child: FutureBuilder<List<Contact>>(
+                future: futureContacts,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    print("Has data");
+
+                    // List<Contact> data = snapshot.data;
+                    return Text("Teste");
+                  } else if (snapshot.hasError) {
+                    print("Error");
+                    print(snapshot.hasError);
+                    print(snapshot);
+                    return Text('${snapshot.hasError}');
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                })
+            // ContactItem(
+            //   listContact: widget.lista,
+            //   onRemove: _removeContact,
+            //   onOpenForm: _openContactFormModal,
+            // ),
+            ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => _openContactFormModal(context),
           child: const Icon(Icons.add),

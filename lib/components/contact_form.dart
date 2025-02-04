@@ -24,6 +24,7 @@ class _ContactFormState extends State<ContactForm> {
   bool _lEdit = true;
   bool _addEdit = false;
   String dropdownValue = "";
+  String dropdownLevelValue = "";
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -31,14 +32,17 @@ class _ContactFormState extends State<ContactForm> {
   final _descriptionContactController = TextEditingController();
   final email = TextEditingController();
   List<String> options = [];
+  List<String> optionLevel = [];
 
   @override
   void initState() {
     super.initState();
 
-    options = loadOptionions();
+    options = loadPhoneType();
+    optionLevel = loadLevel();
 
     dropdownValue = options.first;
+    dropdownLevelValue = optionLevel.first;
     _addEdit = (widget.operation == 3 || widget.operation == 4);
   }
 
@@ -55,15 +59,27 @@ class _ContactFormState extends State<ContactForm> {
     int position = options.indexWhere(
         (element) => element.startsWith(_typeContactController.text));
 
+    // Realiza a carga dos dados referente ao tipo do contato
     if (position >= 0) {
       options = _lEdit ? options : [options[position]];
 
       dropdownValue = _lEdit ? options[position] : options[0];
     }
+
+    // Atualiza o campo de Cargo com os dados do contato
+    position = optionLevel.indexWhere((element) => element
+        .startsWith((_descriptionContactController.text).substring(0, 2)));
+
+    if (position >= 0) {
+      optionLevel = _lEdit ? optionLevel : [optionLevel[position]];
+
+      dropdownLevelValue = _lEdit ? optionLevel[position] : optionLevel[0];
+    }
+
     _lEdit = false;
   }
 
-  List<String> loadOptionions() {
+  List<String> loadPhoneType() {
     List<String> options = <String>[
       "Tipo de Contato",
       "1 - Comercial",
@@ -72,9 +88,21 @@ class _ContactFormState extends State<ContactForm> {
       "4 - WhatsApp",
       "5 - Fax comercial",
     ];
-
-    // =Comercial;2=Residencial;3=Fax comercial;4=Fax residencial;5=Celular
     return options;
+  }
+
+  List<String> loadLevel() {
+    List<String> optionLevel = <String>[
+      "Escolha o cargo",
+      "01 - Presidente",
+      "02 - Diretor",
+      "03 - Gerente",
+      "04 - Supervisor",
+      "05 - Tecnico",
+      "06 - Departamento Financeiro",
+    ];
+
+    return optionLevel;
   }
 
   _submitForm(Map<String, dynamic> detailsContact) {
@@ -157,7 +185,7 @@ class _ContactFormState extends State<ContactForm> {
                   controller: _phoneController,
                   readOnly: !_addEdit,
                   decoration: const InputDecoration(
-                    labelText: "Telefone", /*icon: Icon(Icons.phone)*/
+                    labelText: "DDD + Telefone", /*icon: Icon(Icons.phone)*/
                   ),
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp('[0-9]')),
@@ -187,7 +215,7 @@ class _ContactFormState extends State<ContactForm> {
                 Align(
                   alignment: Alignment.topLeft,
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 5),
+                    padding: const EdgeInsets.only(top: 2),
                     child: DropdownButtonFormField<String>(
                       value: dropdownValue,
                       onChanged: (String? newValue) {
@@ -212,26 +240,28 @@ class _ContactFormState extends State<ContactForm> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 5),
-                  child: TextFormField(
-                    controller: _descriptionContactController,
-                    readOnly: !_addEdit,
-                    decoration: const InputDecoration(
-                        labelText: "Descrição do Contato"),
-                    maxLength: 30,
-                    validator: (value) {
-                      final description = value ?? '';
-
-                      if ((description.trim().isEmpty) && (_addEdit)) {
-                        return "O preenchimento do campo Descrição do Contato é obrigatório.";
+                  padding: const EdgeInsets.only(top: 10),
+                  child: DropdownButtonFormField<String>(
+                    value: dropdownLevelValue,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        dropdownLevelValue = newValue!;
+                        print("Cargo selecionado: $dropdownLevelValue");
+                      });
+                    },
+                    validator: (String? value) {
+                      if ((value == optionLevel.first) && (_addEdit)) {
+                        return "Opção inválida";
                       }
-
-                      if ((description.trim().length < 6) && (_addEdit)) {
-                        return "Descrição do Contato precisa ter,no mínimo, de 6 letras.";
-                      }
-
                       return null;
                     },
+                    items: optionLevel
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                   ),
                 ),
                 Row(
@@ -245,8 +275,7 @@ class _ContactFormState extends State<ContactForm> {
                         detail["name"] = _nameController.text;
                         detail["phone"] = _phoneController.text;
                         detail["tipo"] = dropdownValue;
-                        detail["descricao"] =
-                            _descriptionContactController.text;
+                        detail["descricao"] = dropdownLevelValue;
                         detail["recac8"] =
                             _lEdit ? 0 : widget.listContact![0].idac8;
                         detail["recagb"] =
