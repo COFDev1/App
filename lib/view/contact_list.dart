@@ -19,6 +19,7 @@ class ListContacts extends StatefulWidget {
 class _ListContactsState extends State<ListContacts> {
   String filter = "";
   bool allOk = false;
+  bool hasData = false;
 
   final String url = Autenticacao.urlContacts;
   late String id = widget.cCustomer;
@@ -26,20 +27,12 @@ class _ListContactsState extends State<ListContacts> {
 
   Future<List<Contact>>? futureContacts;
 
-  @override
-  void initState() {
-    super.initState();
-    print("Codigo do cliente recebido :  ${widget.cCustomer}");
-    futureContacts = _list(id: widget.cCustomer);
-    print("Valor retornado: $futureContacts");
-  }
-
   Map<String, String> setHeader() {
     Map<String, String> header = {};
     String token = "";
 
     token =
-        "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InBKd3RQdWJsaWNLZXlGb3IyNTYifQ.eyJpc3MiOiJUT1RWUy1BRFZQTC1GV0pXVCIsInN1YiI6Implc3NlIiwiaWF0IjoxNzM4NjkzNzI4LCJ1c2VyaWQiOiIwMDAwNjEiLCJleHAiOjE3Mzg2OTczMjgsImVudklkIjoiUDEyXzMzX0hPTSJ9.TQ8l7EpHJyWVlE3WPAQKE9tlN-CiOTw8l19BSqOBPVVoAuW2PNLFZmt4HQma0cLug7ZhcGNchsQ9vvQH2H61_tEEMCRPLI0FGmhiIoybmxtNb1j5jgBbYtSM8Z2-__aAPAv5Xz9S24ms-mjatGCXEqHK4Zangx4YWriWZQeHFfjyrkGsjogIY4o9Ah17Sa2PaN9zD-Um_NP78F_WUSUfvun-Yx4GE2STqkZYAxTqq2re6ZYHNYN6CtiUr1q8YMorwVv55x4b3JOY-RRvhrbs9MDvdUoYbzCdJWxkYleKYqbeGGIVz2RGIR2aZpePnqrJpz8D56IQaIrrNGWQK_F4gw";
+        "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InBKd3RQdWJsaWNLZXlGb3IyNTYifQ.eyJpc3MiOiJUT1RWUy1BRFZQTC1GV0pXVCIsInN1YiI6Implc3NlIiwiaWF0IjoxNzM4Nzg2NTY3LCJ1c2VyaWQiOiIwMDAwNjEiLCJleHAiOjE3Mzg3OTAxNjcsImVudklkIjoiUDEyXzMzX0hPTSJ9.RYIZ6Y_K7OA7XCRdl893b7_TGefj38kEqEckVrPv2jAmZbfLakeCw6-kfgvmqrqiEiNpw8l6wvu2LOVP0xOHBRwhU2BAcIBo1o-_cKqjpY6bzvC3Q6yszCLSjdYkUzrqz4PFtLDJFr-Zes1EGmDPC6xSSWz2NGNyK1LRIY8IM_K5FUXoWESwvDbNZU6BPCVV4a-D6s-ljSI44yk7iIRVhaB8B9rTlbpeFRBb-YKzXXRUmBUPqGdD4UVxzvwhDuosI7ggBx8pw-OPQSVWEUjtOKX5NXfNHItPYGNAHPAr_1F5aARhKqqFz04q8ur0cOLGt7iUX8nTuLHCbWY0STjP1A";
     header["Content-Type"] = "application/json";
     header["Authorization"] = "Bearer $token";
 
@@ -53,35 +46,20 @@ class _ListContactsState extends State<ListContacts> {
 
     widget.lista = [];
 
-    // if (response.statusCode == 200) {
-    //   newList = [jsonDecode(response.body)];
-
-    //   newList[0]["items"].forEach((element) {
-    //     widget.lista.add(Contact(
-    //       id: element["id"],
-    //       name: element["name"],
-    //       phone: element["phone"],
-    //       type: element["tipo"],
-    //       description: element["descricao"],
-    //       idac8: element["recac8"],
-    //       idagb: element["recagb"],
-    //       idsa1: element["recsa1"],
-    //       idsu5: element["recsu5"],
-    //     ));
-    //   });
-    //   print("Lista retornada: ${widget.lista}");
-    //   return widget.lista;
-    // } else {
-    //   return Future.error("Ops! Um erro ocorreu.");
-    // }
-
     if (response.statusCode == 200) {
       final json = jsonDecode(response.body)["items"];
 
-      return List<Contact>.from(json.map((elemento) {
+      List<Contact> newList = [];
+
+      newList = List<Contact>.from(json.map((elemento) {
         print("Elemento $elemento");
         return Contact.fromJson(elemento);
       })).toList();
+
+      widget.lista = newList;
+
+      hasData = newList.isEmpty;
+      return newList;
     } else {
       return Future.error("Erro ao conectar com a Api");
     }
@@ -289,32 +267,45 @@ class _ListContactsState extends State<ListContacts> {
           title: const Text("Meus Contatos"),
         ),
         body: SizedBox(
-            height: availableHeight * 0.8,
-            child: FutureBuilder<List<Contact>>(
-                future: futureContacts,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    print("Has data");
+          height: availableHeight * 0.8,
+          child: FutureBuilder<List<Contact>>(
+            future: _list(id: widget.cCustomer),
+            builder: (context, snapshot) {
+              if ((snapshot.hasData && snapshot.data!.isNotEmpty)) {
+                final contato = snapshot.data as List<Contact>;
 
-                    // List<Contact> data = snapshot.data;
-                    return Text("Teste");
-                  } else if (snapshot.hasError) {
-                    print("Error");
-                    print(snapshot.hasError);
-                    print(snapshot);
-                    return Text('${snapshot.hasError}');
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                })
-            // ContactItem(
-            //   listContact: widget.lista,
-            //   onRemove: _removeContact,
-            //   onOpenForm: _openContactFormModal,
-            // ),
-            ),
+                return ContactItem(
+                  listContact: contato,
+                  onRemove: _removeContact,
+                  onOpenForm: _openContactFormModal,
+                );
+
+                // return Text("Teste");
+              } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FittedBox(
+                        child: Text(
+                          "Não há contatos a serem exibidos",
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
+          ),
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => _openContactFormModal(context),
           child: const Icon(Icons.add),
