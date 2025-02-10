@@ -25,7 +25,7 @@ class ControlaUsuario {
   Future<String?> validUser(String user, String password, String token) async {
     Map<String, String> dataCustomer = {};
     dataCustomer["user"] = user;
-    dataCustomer["password"] = password;
+    dataCustomer["password"] = password; //
 
     Map<String, String> request = {
       'Content-Type': 'application/json',

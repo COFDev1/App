@@ -5,6 +5,7 @@ import 'package:whatsappcentral/models/autenticacao.dart';
 import 'package:whatsappcentral/models/contact.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io' show Platform;
 
 class ListContacts extends StatefulWidget {
   List<Contact> lista = [];
@@ -24,6 +25,7 @@ class _ListContactsState extends State<ListContacts> {
   final String url = Autenticacao.urlContacts;
   late String id = widget.cCustomer;
   late var request = setHeader();
+  bool isLoading = false;
 
   Future<List<Contact>>? futureContacts;
 
@@ -32,7 +34,7 @@ class _ListContactsState extends State<ListContacts> {
     String token = "";
 
     token =
-        "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InBKd3RQdWJsaWNLZXlGb3IyNTYifQ.eyJpc3MiOiJUT1RWUy1BRFZQTC1GV0pXVCIsInN1YiI6Implc3NlIiwiaWF0IjoxNzM4Nzg2NTY3LCJ1c2VyaWQiOiIwMDAwNjEiLCJleHAiOjE3Mzg3OTAxNjcsImVudklkIjoiUDEyXzMzX0hPTSJ9.RYIZ6Y_K7OA7XCRdl893b7_TGefj38kEqEckVrPv2jAmZbfLakeCw6-kfgvmqrqiEiNpw8l6wvu2LOVP0xOHBRwhU2BAcIBo1o-_cKqjpY6bzvC3Q6yszCLSjdYkUzrqz4PFtLDJFr-Zes1EGmDPC6xSSWz2NGNyK1LRIY8IM_K5FUXoWESwvDbNZU6BPCVV4a-D6s-ljSI44yk7iIRVhaB8B9rTlbpeFRBb-YKzXXRUmBUPqGdD4UVxzvwhDuosI7ggBx8pw-OPQSVWEUjtOKX5NXfNHItPYGNAHPAr_1F5aARhKqqFz04q8ur0cOLGt7iUX8nTuLHCbWY0STjP1A";
+        "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InBKd3RQdWJsaWNLZXlGb3IyNTYifQ.eyJpc3MiOiJUT1RWUy1BRFZQTC1GV0pXVCIsInN1YiI6Implc3NlIiwiaWF0IjoxNzM5MTg3OTYwLCJ1c2VyaWQiOiIwMDAwNjEiLCJleHAiOjE3MzkxOTE1NjAsImVudklkIjoiUDEyXzMzX0hPTSJ9.eAO-AJJ0_EPprl7-cY_ed94WoxcaSR2ou1Umv6UNvy_e5YOEe2KBlSx3GJ_A3z4e8A6tjf_yUZkPDmp8sSVlRXYaJP0AKnSkuloS7wCEJ2X-gL6ancXAiu4EC8DbBmWevBXuB2ihu78QdDFmcod36of1jSs1fy4E51nQpYo0Ce0DZOZcZcMXm7u4IOREkY_UjBBf5LhXOhAQI9yF18kvXXVU-tw4yL61SOpja9TG9HkjjxdDukgMoJHkW6fQ4Ug97u2oDFE0BYDnyizmD01jSg3z61oAR7H50vc5aduB2e02wOvt0brlzQNDBZnMGAE8BoWks34eDTIKQxlH35sY6A";
     header["Content-Type"] = "application/json";
     header["Authorization"] = "Bearer $token";
 
@@ -40,7 +42,7 @@ class _ListContactsState extends State<ListContacts> {
   }
 
   Future<List<Contact>> _list({String id = ""}) async {
-    List newList = [];
+    List<Contact> newList = [];
 
     final response = await http.get(Uri.parse(url + "${id}"), headers: request);
 
@@ -58,7 +60,6 @@ class _ListContactsState extends State<ListContacts> {
 
       widget.lista = newList;
 
-      hasData = newList.isEmpty;
       return newList;
     } else {
       return Future.error("Erro ao conectar com a Api");
@@ -67,25 +68,34 @@ class _ListContactsState extends State<ListContacts> {
 
   Future<void> _add(
       {Map<String, dynamic>? contact, Contact? newContact}) async {
-    var response = await http.post(
-      Uri.parse(url + "${id}"),
-      headers: request,
-      body: jsonEncode(contact),
-    );
-
-    allOk = response.statusCode == 200 || response.statusCode == 201;
-
-    if (allOk) {
-      String newId = jsonDecode(response.body)["id"];
-
-      newContact!.id = newId;
+    final response = await http
+        .post(
+          Uri.parse(url + "${id}"),
+          headers: request,
+          body: jsonEncode(contact),
+        )
+        .timeout(const Duration(seconds: 10))
+        .catchError((error) {
+      return showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Ocorreu um erro!'),
+          content: const Text("Falha ao cadastrar o contato."),
+          actions: [
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      );
+    }).then((value) {
+      print("Retorno:....${value.body}");
+      setState(() => isLoading = false);
+      allOk = value.statusCode == 200;
 
       Navigator.of(context).pop();
-      _showDialogOk();
-      setState(() {
-        widget.lista.insert(0, newContact!);
-      });
-    }
+    });
   }
 
   Future<void> _edit(
@@ -105,35 +115,51 @@ class _ListContactsState extends State<ListContacts> {
       _showDialogOk();
       setState(() {
         int position = widget.lista.indexWhere((element) => element.id == id);
-
+        setState(() => isLoading = false);
         widget.lista[position] = newContact!;
       });
     }
   }
 
   Future<void> _delete({int recsu5 = 0, recagb = 0}) async {
-    Map<String, int> body = {};
+    final client = http.Client();
 
-    body["recsu5"] = recsu5;
-    body["recagb"] = recagb;
+    try {
+      final response = await client
+          .delete(
+              Uri.parse(url + "${id}" + "/" + "${recsu5}" + "/" + "${recagb}"),
+              headers: request)
+          .timeout(const Duration(seconds: 10));
 
-    final response = await http
-        .delete(
-      Uri.parse(url + "${id}"),
-      headers: request,
-      body: jsonEncode(body),
-    )
-        .then((value) {
-      print("Retorno:....${value.body}");
-    });
-
-    allOk = response.statusCode == 200;
-
-    if (allOk) {
-      Navigator.of(context).pop();
-      _showDialogOk();
-      _removeContact(id);
+      if (response.statusCode != 200) {
+        throw Exception("Não foi possivel efetivar a exclusão do contato");
+      } else {
+        _removeContact(id);
+        setState(() => isLoading = false);
+        Navigator.of(context).pop();
+        _showDialogOk();
+      }
+    } catch (e) {
+      return showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Ocorreu um erro!'),
+          content: const Text('Falha ao excluir o contato:'),
+          actions: [
+            TextButton(
+                child: const Text('Ok'),
+                onPressed: () {
+                  setState(() => isLoading = false);
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                }),
+          ],
+        ),
+      );
     }
+    // finally {
+    //   client.close();
+    // }
   }
 
   Future<void> _validInsert(String phone) async {
@@ -143,20 +169,18 @@ class _ListContactsState extends State<ListContacts> {
   }
 
   void _showDialogOk() {
-    showDialog(
+    showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Confirmação"),
-          content: const Text("Operação realizada com sucesso!!!"),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("Ok"),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
-        );
-      },
+      builder: (ctx) => AlertDialog(
+        title: const Text('Sucesso'),
+        content: const Text('Operacao realizada com sucesso.'),
+        actions: [
+          TextButton(
+            child: const Text('Ok'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -192,6 +216,8 @@ class _ListContactsState extends State<ListContacts> {
         details["index"] != -1 ? widget.lista[details["index"]].id : "";
 
     details.remove("index");
+
+    // setState(() => isLoading = true);
 
     final Contact newContact = Contact(
       id: id,
@@ -266,46 +292,48 @@ class _ListContactsState extends State<ListContacts> {
         appBar: AppBar(
           title: const Text("Meus Contatos"),
         ),
-        body: SizedBox(
-          height: availableHeight * 0.8,
-          child: FutureBuilder<List<Contact>>(
-            future: _list(id: widget.cCustomer),
-            builder: (context, snapshot) {
-              if ((snapshot.hasData && snapshot.data!.isNotEmpty)) {
-                final contato = snapshot.data as List<Contact>;
+        body: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : SizedBox(
+                height: availableHeight * 0.8,
+                child: FutureBuilder<List<Contact>>(
+                  future: _list(id: widget.cCustomer),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                      final contato = snapshot.data as List<Contact>;
 
-                return ContactItem(
-                  listContact: contato,
-                  onRemove: _removeContact,
-                  onOpenForm: _openContactFormModal,
-                );
-
-                // return Text("Teste");
-              } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FittedBox(
-                        child: Text(
-                          "Não há contatos a serem exibidos",
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      return ContactItem(
+                        listContact: contato,
+                        onRemove: _removeContact,
+                        onOpenForm: _openContactFormModal,
+                      );
+                    } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FittedBox(
+                              child: Text(
+                                "Não há contatos a serem exibidos",
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            },
-          ),
-        ),
+                      );
+                    } else {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
+                ),
+              ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => _openContactFormModal(context),
           child: const Icon(Icons.add),
