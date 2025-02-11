@@ -4,8 +4,10 @@ import 'package:whatsappcentral/components/contact_item.dart';
 import 'package:whatsappcentral/models/autenticacao.dart';
 import 'package:whatsappcentral/models/contact.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'dart:convert';
-import 'dart:io' show Platform;
+
+import 'package:whatsappcentral/models/protheus.dart';
 
 class ListContacts extends StatefulWidget {
   List<Contact> lista = [];
@@ -24,25 +26,48 @@ class _ListContactsState extends State<ListContacts> {
 
   final String url = Autenticacao.urlContacts;
   late String id = widget.cCustomer;
-  late var request = setHeader();
+
+  late Map<String, String> request = Map();
   bool isLoading = false;
 
   Future<List<Contact>>? futureContacts;
 
-  Map<String, String> setHeader() {
+  Future<Map<String, String>> setHeader() async {
     Map<String, String> header = {};
     String token = "";
 
-    token =
-        "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InBKd3RQdWJsaWNLZXlGb3IyNTYifQ.eyJpc3MiOiJUT1RWUy1BRFZQTC1GV0pXVCIsInN1YiI6Implc3NlIiwiaWF0IjoxNzM5MTg3OTYwLCJ1c2VyaWQiOiIwMDAwNjEiLCJleHAiOjE3MzkxOTE1NjAsImVudklkIjoiUDEyXzMzX0hPTSJ9.eAO-AJJ0_EPprl7-cY_ed94WoxcaSR2ou1Umv6UNvy_e5YOEe2KBlSx3GJ_A3z4e8A6tjf_yUZkPDmp8sSVlRXYaJP0AKnSkuloS7wCEJ2X-gL6ancXAiu4EC8DbBmWevBXuB2ihu78QdDFmcod36of1jSs1fy4E51nQpYo0Ce0DZOZcZcMXm7u4IOREkY_UjBBf5LhXOhAQI9yF18kvXXVU-tw4yL61SOpja9TG9HkjjxdDukgMoJHkW6fQ4Ug97u2oDFE0BYDnyizmD01jSg3z61oAR7H50vc5aduB2e02wOvt0brlzQNDBZnMGAE8BoWks34eDTIKQxlH35sY6A";
-    header["Content-Type"] = "application/json";
-    header["Authorization"] = "Bearer $token";
+    await Provider.of<Protheus>(context, listen: false)
+        .getToken()
+        .catchError((error) {
+      return showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text("Erro"),
+          content: const Text("Falha na captura do token"),
+          actions: [
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      );
+    }).then((value) {
+      token = value["token"];
+
+      print("Resultado do provider: ${value}");
+
+      header["Content-Type"] = "application/json";
+      header["Authorization"] = "Bearer $token";
+    });
 
     return header;
   }
 
   Future<List<Contact>> _list({String id = ""}) async {
     List<Contact> newList = [];
+
+    request = await setHeader();
 
     final response = await http.get(Uri.parse(url + "${id}"), headers: request);
 
@@ -54,7 +79,6 @@ class _ListContactsState extends State<ListContacts> {
       List<Contact> newList = [];
 
       newList = List<Contact>.from(json.map((elemento) {
-        print("Elemento $elemento");
         return Contact.fromJson(elemento);
       })).toList();
 
@@ -68,13 +92,11 @@ class _ListContactsState extends State<ListContacts> {
 
   Future<void> _add(
       {Map<String, dynamic>? contact, Contact? newContact}) async {
+    // Gera o token de acesso a Protheus
+    request = await setHeader();
     final response = await http
-        .post(
-          Uri.parse(url + "${id}"),
-          headers: request,
-          body: jsonEncode(contact),
-        )
-        .timeout(const Duration(seconds: 10))
+        .post(Uri.parse(url + "${id}"),
+            headers: request, body: jsonEncode(contact))
         .catchError((error) {
       return showDialog<void>(
         context: context,
@@ -90,23 +112,23 @@ class _ListContactsState extends State<ListContacts> {
         ),
       );
     }).then((value) {
-      print("Retorno:....${value.body}");
       setState(() => isLoading = false);
       allOk = value.statusCode == 200;
-
       Navigator.of(context).pop();
+      _showDialogOk();
     });
   }
 
-  Future<void> _edit(
-      {Map<String, dynamic>? contact,
-      Contact? newContact,
-      String id = ""}) async {
-    var response = await http.put(
-      Uri.parse(url + "$id"),
-      headers: request,
-      body: jsonEncode(contact),
-    );
+  Future<void> _edit({
+    Map<String, dynamic>? contact,
+    Contact? newContact,
+    String id = "",
+  }) async {
+    // Gera o token de acesso a Protheus
+    request = await setHeader();
+
+    var response = await http.put(Uri.parse(url + "$id"),
+        headers: request, body: jsonEncode(contact));
 
     allOk = response.statusCode == 200 || response.statusCode == 201;
 
@@ -124,12 +146,13 @@ class _ListContactsState extends State<ListContacts> {
   Future<void> _delete({int recsu5 = 0, recagb = 0}) async {
     final client = http.Client();
 
+    request = await setHeader();
+
     try {
-      final response = await client
-          .delete(
-              Uri.parse(url + "${id}" + "/" + "${recsu5}" + "/" + "${recagb}"),
-              headers: request)
-          .timeout(const Duration(seconds: 10));
+      final response = await client.delete(
+        Uri.parse(url + "${id}" + "/" + "${recsu5}" + "/" + "${recagb}"),
+        headers: request,
+      );
 
       if (response.statusCode != 200) {
         throw Exception("Não foi possivel efetivar a exclusão do contato");
@@ -156,10 +179,9 @@ class _ListContactsState extends State<ListContacts> {
           ],
         ),
       );
+    } finally {
+      client.close();
     }
-    // finally {
-    //   client.close();
-    // }
   }
 
   Future<void> _validInsert(String phone) async {
@@ -216,8 +238,6 @@ class _ListContactsState extends State<ListContacts> {
         details["index"] != -1 ? widget.lista[details["index"]].id : "";
 
     details.remove("index");
-
-    // setState(() => isLoading = true);
 
     final Contact newContact = Contact(
       id: id,

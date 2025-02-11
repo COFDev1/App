@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:provider/provider.dart';
 import 'package:whatsappcentral/components/controlaUsuario.dart';
 import 'package:whatsappcentral/models/contact.dart';
 import 'package:http/http.dart' as http;
+import 'package:whatsappcentral/models/protheus.dart';
 
 class MyWidget extends StatefulWidget {
   const MyWidget({super.key});
@@ -13,6 +15,30 @@ class MyWidget extends StatefulWidget {
 
 class _MyWidgetState extends State<MyWidget> {
   Future<List<Contact>>? lista;
+
+  void _getToken() {
+    Map<String, String> header = Map();
+
+    Provider.of<Protheus>(context, listen: false)
+        .getToken()
+        .catchError((error) {
+      return showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text("Erro"),
+          content: const Text("Falha na captura do token"),
+          actions: [
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      );
+    }).then((value) {
+      print("Resultado: ${value}");
+    });
+  }
 
   @override
   void initState() {
@@ -34,22 +60,23 @@ class _MyWidgetState extends State<MyWidget> {
         ),
       ),
       body: Container(
-        child: FutureBuilder(
-            future: getFutureDados(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Center(
-                  child: Text(
-                    snapshot.data!,
-                    style: const TextStyle(fontSize: 20.0),
-                  ),
-                );
-              } else {
-                return Center(
-                  child: const CircularProgressIndicator(),
-                );
-              }
-            }),
+        child: Column(
+          children: [
+            Center(
+              child: ElevatedButton(
+                  onPressed: () {
+                    _getToken();
+                  },
+                  child: Text("ok")),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _getToken();
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
