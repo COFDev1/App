@@ -25,8 +25,7 @@ class ContactItem extends StatelessWidget {
           itemCount: listContact.length,
           itemBuilder: (ctx, index) {
             final element = listContact[index];
-            print("Valor instanciado: ${element.name}");
-            teste.add(element);
+
             return Card(
               elevation: 5,
               margin: const EdgeInsets.symmetric(
@@ -34,28 +33,50 @@ class ContactItem extends StatelessWidget {
                 horizontal: 5,
               ),
               child: ListTile(
-                  onTap: () => onOpenForm(context, element.id, index, 4),
-                  leading: Padding(
-                    padding: const EdgeInsets.all(6),
-                    child: FittedBox(
-                      child: Text(
-                        '${element.id}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                        ),
+                onTap: () => onOpenForm(context, element.id, index, 4),
+                leading: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: FittedBox(
+                    child: Text(
+                      '${element.id}',
+                      style: const TextStyle(
+                        color: Colors.white,
                       ),
                     ),
                   ),
-                  title: Text(
-                    element.name,
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  subtitle: Text(element.phone),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    color: Theme.of(context).errorColor,
-                    onPressed: () => onOpenForm(context, element.id, index, 5),
-                  )),
+                ),
+                title: Text(
+                  element.name,
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                subtitle: Text(element.phone),
+                trailing: PopupMenuButton(
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      child: Column(
+                        children: [
+                          TextButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              onOpenForm(context, element.id, index, 4);
+                            },
+                            icon: const Icon(Icons.edit),
+                            label: const Text("Alterar"),
+                          ),
+                          TextButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              onOpenForm(context, element.id, index, 5);
+                            },
+                            icon: const Icon(Icons.delete),
+                            label: const Text("Excluir"),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             );
           },
         ),
