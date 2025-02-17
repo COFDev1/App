@@ -1,9 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:whatsappcentral/view/contact_list.dart';
-import 'package:whatsappcentral/view/teste.dart';
+
 import '../components/controlaUsuario.dart';
-import '../models/autenticacao.dart';
-import 'package:http/http.dart' as http;
+import '../components/show_process.dart';
 import 'list_customers.dart';
 
 class LoginPage extends StatefulWidget {
@@ -22,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   late String titulo;
   late String actionButton;
   late String toggleButton;
-  bool loading = false;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -81,12 +81,17 @@ class _LoginPageState extends State<LoginPage> {
         );
 
     if (seller != null && seller.isNotEmpty) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ListCustomers(token: token, sales: seller),
-        ),
-      );
+      Timer(Duration(seconds: 4), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ListCustomers(token: token, sales: seller),
+          ),
+        );
+        setState(() {
+          isLogin = false;
+        });
+      });
     } else {
       showDialog<void>(
         context: context,
@@ -107,106 +112,117 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 100),
-          child: Form(
-            key: formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  titulo,
-                  style: const TextStyle(
-                    fontSize: 35,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -1.5,
+      body: isLoading
+          ? ShowProcess(
+              message: "Aguarde...Autenticando seu usuário... ",
+            )
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 100),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        titulo,
+                        style: const TextStyle(
+                          fontSize: 35,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -1.5,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: TextFormField(
+                          controller: user,
+                          // style: TextStyle(color: Colors.blue, fontSize: 30),
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: "Usuário",
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return "Informe seu usuário";
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12.0, horizontal: 24.0),
+                        child: TextFormField(
+                          controller: senha,
+                          obscureText: true,
+                          // keyboardType: TextInputType.number,
+                          style:
+                              const TextStyle(color: Colors.blue, fontSize: 30),
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: "Senha",
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return "Informa sua senha!";
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              if (isLogin) {
+                                setState(() {
+                                  isLogin = true;
+                                });
+
+                                login();
+                              }
+                            }
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: (isLoading)
+                                ? [
+                                    const Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(16),
+                                        child: SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ]
+                                : [
+                                    Icon(Icons.check),
+                                    Padding(
+                                      padding: EdgeInsets.all(16.0),
+                                      child: Text(
+                                        actionButton,
+                                        // style: TextStyle(fontSize: 20),
+                                      ),
+                                    ),
+                                  ],
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => setFormAction(!isLogin),
+                        child: Text(""),
+                      ),
+                    ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: TextFormField(
-                    controller: user,
-                    // style: TextStyle(color: Colors.blue, fontSize: 30),
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: "Usuário",
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return "Informe seu usuário";
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 12.0, horizontal: 24.0),
-                  child: TextFormField(
-                    controller: senha,
-                    obscureText: true,
-                    keyboardType: TextInputType.number,
-                    style: const TextStyle(color: Colors.blue, fontSize: 30),
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: "Senha",
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return "Informa sua senha!";
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (formKey.currentState!.validate()) {
-                        if (isLogin) {
-                          login();
-                        }
-                      }
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: (loading)
-                          ? [
-                              Padding(
-                                padding: EdgeInsets.all(16),
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              )
-                            ]
-                          : [
-                              Icon(Icons.check),
-                              Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Text(
-                                  actionButton,
-                                  // style: TextStyle(fontSize: 20),
-                                ),
-                              ),
-                            ],
-                    ),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => setFormAction(!isLogin),
-                  child: Text(""),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'package:whatsappcentral/models/autenticacao.dart';
+import '/models/autenticacao.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -29,12 +29,8 @@ class ControlaUsuario {
 
     Map<String, String> request = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token'
+      'Authorization': 'Bearer $token',
     };
-
-    // var response = await http
-    //     .post(Uri.parse(Autenticacao.urlSeller))
-    //     .timeout(const Duration(seconds: 3));
 
     var response = await http.post(
       Uri.parse(Autenticacao.urlSeller),

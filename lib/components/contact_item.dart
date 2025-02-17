@@ -1,7 +1,5 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
-import 'package:whatsappcentral/models/contact.dart';
+import '/models/contact.dart';
 
 class ContactItem extends StatelessWidget {
   final List<Contact> listContact;
@@ -33,21 +31,20 @@ class ContactItem extends StatelessWidget {
                 horizontal: 5,
               ),
               child: ListTile(
-                onTap: () => onOpenForm(context, element.id, index, 4),
+                onTap: () => onOpenForm(context, element.id, index, 2),
                 leading: Padding(
                   padding: const EdgeInsets.all(6),
                   child: FittedBox(
                     child: Text(
                       '${element.id}',
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                       ),
                     ),
                   ),
                 ),
                 title: Text(
                   element.name,
-                  style: Theme.of(context).textTheme.headline6,
                 ),
                 subtitle: Text(element.phone),
                 trailing: PopupMenuButton(
@@ -68,7 +65,10 @@ class ContactItem extends StatelessWidget {
                               Navigator.of(context).pop();
                               onOpenForm(context, element.id, index, 5);
                             },
-                            icon: const Icon(Icons.delete),
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Colors.red,
+                            ),
                             label: const Text("Excluir"),
                           ),
                         ],

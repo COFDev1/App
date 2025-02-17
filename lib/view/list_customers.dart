@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:whatsappcentral/models/autenticacao.dart';
+import '../components/show_process.dart';
+import '../models/autenticacao.dart';
 import '../models/customer.dart';
 import '../components/custom_item.dart';
 import '../view/logins_screen.dart';
@@ -36,7 +37,6 @@ class _ListCustomersState extends State<ListCustomers> {
   }
 
   void _filter(String valueSearch) {
-    // if (valueSearch.isNotEmpty) {
     List<Customer> results = [];
 
     if (valueSearch.isEmpty) {
@@ -46,9 +46,7 @@ class _ListCustomersState extends State<ListCustomers> {
           .where((user) =>
               user.name.toLowerCase().contains(valueSearch.toLowerCase()))
           .toList();
-      // we use the toLowerCase() method to make it case-insensitive
     }
-
     setState(() {
       listCustomers = results;
     });
@@ -75,12 +73,20 @@ class _ListCustomersState extends State<ListCustomers> {
     if (response.body == 'null') return;
     Map<String, dynamic> data = jsonDecode(response.body);
 
+    print('Valor retornado: $response.body');
+
     data["items"].forEach((element) {
       listCustomers.add(
         Customer(
           id: element["codigo"],
           name: element["nome"],
           whatsapp: element["tel"],
+          address: element["endco"],
+          burgh: element["bairro"],
+          city: element["municipio"],
+          complement: element["compl"],
+          state: element["uf"],
+          zipcode: element["cep"],
         ),
       );
     });
@@ -99,7 +105,10 @@ class _ListCustomersState extends State<ListCustomers> {
       title: const Text("Listagem de Clientes"),
       actions: [
         IconButton(
-          icon: const Icon(Icons.logout),
+          icon: const Icon(
+            Icons.logout,
+            color: Colors.black,
+          ),
           onPressed: () {
             Navigator.pushReplacement(
               context,
@@ -118,28 +127,16 @@ class _ListCustomersState extends State<ListCustomers> {
     return SafeArea(
       child: Scaffold(
         appBar: appBar,
-        body: Column(
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: (loading)
-                    ? [
-                        const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(16),
-                            child: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const Text("Aguarde...Carregando os clientes..."),
-                      ]
-                    : [
+        body: loading
+            ? ShowProcess(
+                message: "Aguarde...Buscando os clientes... ",
+              )
+            : Column(
+                children: [
+                  SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
                         SizedBox(
                           height: availableHeight * 0.12,
                           // width: mediaQuery.size.width * 0.8,
@@ -174,10 +171,10 @@ class _ListCustomersState extends State<ListCustomers> {
                         //   ),
                         // ),
                       ],
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }

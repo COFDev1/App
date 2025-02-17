@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:whatsappcentral/models/customer.dart';
-import 'package:whatsappcentral/view/contact_list.dart';
+import '../models/customer.dart';
+import '../view/contact_list.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -19,64 +19,52 @@ class CustomerForm extends StatefulWidget {
 }
 
 class _CustomerFormState extends State<CustomerForm> {
-  late final name = TextEditingController(text: widget.customer.name);
-  late final whastApp = TextEditingController(text: widget.customer.whatsapp);
+  late final _nameController =
+      TextEditingController(text: widget.customer.name);
+  late final _adressController =
+      TextEditingController(text: widget.customer.address);
+  late final _whastAppController =
+      TextEditingController(text: widget.customer.whatsapp);
+  late final _burghController =
+      TextEditingController(text: widget.customer.burgh);
+  late final _cityController =
+      TextEditingController(text: widget.customer.city);
 
-  void _save(Map<String, String> infoCustomer) async {
-    const url = 'http://192.168.2.12:8083/rest/app/customers/';
-    const String token =
-        "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InBKd3RQdWJsaWNLZXlGb3IyNTYifQ.eyJpc3MiOiJUT1RWUy1BRFZQTC1GV0pXVCIsInN1YiI6Implc3NlIiwiaWF0IjoxNzMzNzU0MDM1LCJ1c2VyaWQiOiIwMDAwNjEiLCJleHAiOjE3MzM3NTc2MzUsImVudklkIjoiUDEyXzMzX0hPTSJ9.TeQ4f8AlBb8X04_DtVXluFUUePnlhmBa1q0PIkwThVnqn6MbslH5NLaM5ZeTn48uIayzyJtVbdTHwLJk8BoV-F2XQ5coKTWIYEvOAP04LqFaPdpRAj1Ecok68atVDmHj58dEzvGQAdpERQVnVClS7wcU-tydIbBGNq8HiOP0KT9wO5Y_WrdhXnscibfayvVtseQ-zMOG6C7zQUDDvwAkGgziajmu8gtZIGawrfm4qIccfrmDMNJfDTJS7u8mDbRjx3-cvn3E9ofd-wJYm2tVmuDwiPz5Hmn2Za_EmjcKtAiOqVbfdMMsMFNlXWCVmQIJSQF0xGwR3I9AQfbrYojA6g";
+  late final _complementController =
+      TextEditingController(text: widget.customer.complement);
 
-    Map<String, dynamic> body = {};
-    body["user"] = "fernando.lopez";
-    body["password"] = "031019";
-
-    var teste = JsonEncoder().convert(body);
-
-    Map<String, String> request = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token'
-    };
-
-    final response = await http
-        .post(
-      Uri.parse(url),
-      headers: request,
-      body: jsonEncode(infoCustomer),
-    )
-        .then((_) {
-      print("Passou aqui agora....");
-    });
-    Navigator.of(context).pop();
-  }
+  late final _zipcodeController =
+      TextEditingController(text: widget.customer.zipcode);
+  late final _stateController =
+      TextEditingController(text: widget.customer.state);
 
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    final actions = [];
+    final actions = [
+      PopupMenuButton(
+        icon: const Icon(Icons.more_vert),
+        itemBuilder: (_) => [
+          const PopupMenuItem(
+            value: FilterOptions.list_contacts,
+            child: Text("Meus Contatos"),
+          ),
+        ],
+        onSelected: (_) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (context) => ListContacts(
+                      lista: [],
+                      cCustomer: widget.customer.id,
+                    )),
+          );
+        },
+      )
+    ];
 
     final PreferredSizeWidget appBar = AppBar(
       title: Text(widget.customer.name),
-      actions: [
-        PopupMenuButton(
-          icon: const Icon(Icons.more_vert),
-          itemBuilder: (_) => [
-            const PopupMenuItem(
-              value: FilterOptions.list_contacts,
-              child: Text("Meus Contatos"),
-            ),
-          ],
-          onSelected: (_) {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                  builder: (context) => ListContacts(
-                        lista: [],
-                        cCustomer: widget.customer.id,
-                      )),
-            );
-          },
-        )
-      ],
+      actions: actions,
     );
 
     final availableHeight = mediaQuery.size.height -
@@ -98,89 +86,55 @@ class _CustomerFormState extends State<CustomerForm> {
                         Padding(
                           padding: const EdgeInsets.only(top: 16.0),
                           child: TextField(
-                            controller: name,
+                            controller: _nameController,
                             onSubmitted: (_) => {},
+                            readOnly: true,
                             decoration: InputDecoration(labelText: 'Nome'),
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 16.0),
                           child: TextField(
-                            controller: whastApp,
+                            controller: _adressController,
                             onSubmitted: (_) => {},
-                            decoration: InputDecoration(labelText: 'WhatsApp'),
+                            readOnly: true,
+                            decoration: InputDecoration(labelText: 'Endereço'),
                             keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
+                                TextInputType.numberWithOptions(decimal: false),
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(15.0),
+                          padding: const EdgeInsets.all(10.0),
                           child: Column(
                             children: [],
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 16.0),
+                          padding: const EdgeInsets.only(top: 5.0),
                           child: TextField(
-                            controller: name,
+                            controller: _burghController,
+                            readOnly: true,
                             onSubmitted: (_) => {},
-                            decoration: InputDecoration(labelText: 'Nome'),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16.0),
-                          child: TextField(
-                            controller: whastApp,
-                            onSubmitted: (_) => {},
-                            decoration: InputDecoration(labelText: 'WhatsApp'),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: Column(
-                            children: [],
+                            decoration: InputDecoration(labelText: 'Bairro'),
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 16.0),
                           child: TextField(
-                            controller: name,
+                            controller: _cityController,
                             onSubmitted: (_) => {},
-                            decoration: InputDecoration(labelText: 'Nome'),
+                            readOnly: true,
+                            decoration: InputDecoration(labelText: 'Cidade'),
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 16.0),
                           child: TextField(
-                            controller: whastApp,
+                            controller: _complementController,
+                            readOnly: true,
                             onSubmitted: (_) => {},
-                            decoration: InputDecoration(labelText: 'WhatsApp'),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: Column(
-                            children: [],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16.0),
-                          child: TextField(
-                            controller: name,
-                            onSubmitted: (_) => {},
-                            decoration: InputDecoration(labelText: 'Nome'),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16.0),
-                          child: TextField(
-                            controller: whastApp,
-                            onSubmitted: (_) => {},
-                            decoration: InputDecoration(labelText: 'WhatsApp'),
+                            decoration:
+                                InputDecoration(labelText: 'Complemento'),
                             keyboardType:
                                 TextInputType.numberWithOptions(decimal: true),
                           ),
@@ -188,9 +142,10 @@ class _CustomerFormState extends State<CustomerForm> {
                         Padding(
                           padding: const EdgeInsets.only(top: 16.0),
                           child: TextField(
-                            controller: whastApp,
+                            controller: _zipcodeController,
+                            readOnly: true,
                             onSubmitted: (_) => {},
-                            decoration: InputDecoration(labelText: 'Teste'),
+                            decoration: InputDecoration(labelText: 'Cep'),
                             keyboardType:
                                 TextInputType.numberWithOptions(decimal: true),
                           ),
@@ -198,13 +153,58 @@ class _CustomerFormState extends State<CustomerForm> {
                         Padding(
                           padding: const EdgeInsets.only(top: 16.0),
                           child: TextField(
-                            controller: whastApp,
+                            controller: _stateController,
+                            readOnly: true,
                             onSubmitted: (_) => {},
-                            decoration: InputDecoration(labelText: 'Teste 123'),
+                            decoration: InputDecoration(labelText: 'Estado'),
                             keyboardType:
                                 TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
+                        // Padding(
+                        //   padding: const EdgeInsets.all(15.0),
+                        //   child: Column(
+                        //     children: [],
+                        //   ),
+                        // ),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(top: 16.0),
+                        //   child: TextField(
+                        //     controller: name,
+                        //     onSubmitted: (_) => {},
+                        //     decoration: InputDecoration(labelText: 'Nome'),
+                        //   ),
+                        // ),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(top: 16.0),
+                        //   child: TextField(
+                        //     controller: whastApp,
+                        //     onSubmitted: (_) => {},
+                        //     decoration: InputDecoration(labelText: 'WhatsApp'),
+                        //     keyboardType:
+                        //         TextInputType.numberWithOptions(decimal: true),
+                        //   ),
+                        // ),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(top: 16.0),
+                        //   child: TextField(
+                        //     controller: whastApp,
+                        //     onSubmitted: (_) => {},
+                        //     decoration: InputDecoration(labelText: 'Teste'),
+                        //     keyboardType:
+                        //         TextInputType.numberWithOptions(decimal: true),
+                        //   ),
+                        // ),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(top: 16.0),
+                        //   child: TextField(
+                        //     controller: whastApp,
+                        //     onSubmitted: (_) => {},
+                        //     decoration: InputDecoration(labelText: 'Teste 123'),
+                        //     keyboardType:
+                        //         TextInputType.numberWithOptions(decimal: true),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),

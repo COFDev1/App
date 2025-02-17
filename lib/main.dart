@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:whatsappcentral/models/protheus.dart';
-import 'package:whatsappcentral/utils/app_routes.dart';
-import 'package:whatsappcentral/view/contact_list.dart';
+import '/models/protheus.dart';
 import 'view/logins_screen.dart';
-import 'view/teste.dart';
+// import 'view/teste.dart';
 
 void main() {
-  runApp(const MyApp()); //
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -17,17 +15,29 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final ThemeData darkTheme = ThemeData(
+      brightness: Brightness.dark,
+      primaryColor: Colors.grey[900],
+    );
+
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (_) => Protheus(),
-        ),
-      ],
+      providers: [ChangeNotifierProvider(create: (_) => Protheus())],
       child: MaterialApp(
         title: "Relacionamento com o Cliente",
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          useMaterial3: false,
+          fontFamily: 'Lato',
+          appBarTheme: const AppBarTheme(
+            titleTextStyle: TextStyle(
+              fontFamily: 'OpenSans',
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            backgroundColor: Colors.blue,
+          ),
         ),
+
         home: LoginPage(), // ListCustomers() LoginPage() MyWidget()
         routes: {
           // AppRoutes.listContact: (ctx) =>

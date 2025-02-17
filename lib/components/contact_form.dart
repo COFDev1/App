@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:whatsappcentral/models/contact.dart';
+import 'package:newapp/components/show_process.dart';
+import '/models/contact.dart';
 
 class ContactForm extends StatefulWidget {
   final void Function(Map<String, dynamic>, int, BuildContext) onSubmit;
@@ -22,7 +23,9 @@ class ContactForm extends StatefulWidget {
 
 class _ContactFormState extends State<ContactForm> {
   bool _lEdit = true;
+  bool _view = false;
   bool _addEdit = false;
+  String _message = "";
   String dropdownValue = "";
   String dropdownLevelValue = "";
   bool isLoading = false;
@@ -51,6 +54,8 @@ class _ContactFormState extends State<ContactForm> {
     dropdownValue = options.first;
 
     _lEdit = widget.operation == 3 || widget.operation == 4;
+    _view = widget.operation == 2;
+
     _nameController.text = widget.listContact![0].name;
     _phoneController.text = widget.listContact![0].phone;
     _typeContactController.text = widget.listContact![0].type;
@@ -115,6 +120,10 @@ class _ContactFormState extends State<ContactForm> {
       return;
     }
 
+    _message = _addEdit
+        ? "Aguarde... Gravando os dados do contato..."
+        : "Aguarde... Excluindo os dados do contato...";
+
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
@@ -149,11 +158,9 @@ class _ContactFormState extends State<ContactForm> {
       _editContact();
     }
 
-    List<Widget> children;
-
     return isLoading
-        ? const Center(
-            child: CircularProgressIndicator(),
+        ? ShowProcess(
+            message: _message,
           )
         : SingleChildScrollView(
             child: Card(
@@ -255,7 +262,6 @@ class _ContactFormState extends State<ContactForm> {
                           onChanged: (String? newValue) {
                             setState(() {
                               dropdownLevelValue = newValue!;
-                              print("Cargo selecionado: $dropdownLevelValue");
                             });
                           },
                           validator: (String? value) {
@@ -278,23 +284,25 @@ class _ContactFormState extends State<ContactForm> {
                         children: <Widget>[
                           ElevatedButton(
                             onPressed: () {
-                              Map<String, dynamic> detail = Map();
+                              Map<String, dynamic> form = {};
 
-                              detail["index"] = widget.index;
-                              detail["name"] = _nameController.text;
-                              detail["phone"] = _phoneController.text;
-                              detail["tipo"] = dropdownValue;
-                              detail["descricao"] = dropdownLevelValue;
-                              detail["recac8"] =
+                              form["index"] = widget.index;
+                              form["name"] = _nameController.text;
+                              form["phone"] = _phoneController.text;
+                              form["tipo"] = dropdownValue;
+                              form["descricao"] = dropdownLevelValue;
+                              form["recac8"] =
                                   _lEdit ? 0 : widget.listContact![0].idac8;
-                              detail["recagb"] =
+                              form["recagb"] =
                                   _lEdit ? 0 : widget.listContact![0].idagb;
-                              detail["recsa1"] =
+                              form["recsa1"] =
                                   _lEdit ? 0 : widget.listContact![0].idsa1;
-                              detail["recsu5"] =
+                              form["recsu5"] =
                                   _lEdit ? 0 : widget.listContact![0].idsu5;
 
-                              _submitForm(detail);
+                              _view
+                                  ? Navigator.of(context).pop()
+                                  : _submitForm(form);
                             },
                             child: const Text("Gravar"),
                           ),

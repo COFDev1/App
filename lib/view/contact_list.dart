@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:whatsappcentral/components/contact_form.dart';
-import 'package:whatsappcentral/components/contact_item.dart';
-import 'package:whatsappcentral/models/autenticacao.dart';
-import 'package:whatsappcentral/models/contact.dart';
+import 'package:newapp/components/show_process.dart';
+import '../components/contact_form.dart';
+import '../components/contact_item.dart';
+import '../models/autenticacao.dart';
+import '../models/contact.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'dart:convert';
 
-import 'package:whatsappcentral/models/protheus.dart';
+import '../models/protheus.dart';
 
 class ListContacts extends StatefulWidget {
   List<Contact> lista = [];
@@ -21,13 +22,14 @@ class ListContacts extends StatefulWidget {
 
 class _ListContactsState extends State<ListContacts> {
   String filter = "";
+  final String _message = "Aguarde... Listando os Contatos...";
   bool allOk = false;
   bool hasData = false;
 
   final String url = Autenticacao.urlContacts;
   late String id = widget.cCustomer;
 
-  late Map<String, String> request = Map();
+  late Map<String, String> request = {};
   bool isLoading = false;
 
   Future<List<Contact>>? futureContacts;
@@ -294,8 +296,6 @@ class _ListContactsState extends State<ListContacts> {
 
   @override
   Widget build(BuildContext context) {
-    bool dataOk = widget.lista.isEmpty;
-
     final mediaQuery = MediaQuery.of(context);
 
     final PreferredSizeWidget appBar = AppBar(
@@ -313,8 +313,8 @@ class _ListContactsState extends State<ListContacts> {
           title: const Text("Meus Contatos"),
         ),
         body: isLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
+            ? ShowProcess(
+                message: _message,
               )
             : SizedBox(
                 height: availableHeight * 0.8,
@@ -347,8 +347,8 @@ class _ListContactsState extends State<ListContacts> {
                         ),
                       );
                     } else {
-                      return Center(
-                        child: CircularProgressIndicator(),
+                      return ShowProcess(
+                        message: _message,
                       );
                     }
                   },

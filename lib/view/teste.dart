@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:provider/provider.dart';
-import 'package:whatsappcentral/components/controlaUsuario.dart';
-import 'package:whatsappcentral/models/contact.dart';
-import 'package:http/http.dart' as http;
-import 'package:whatsappcentral/models/protheus.dart';
+import '../models/contact.dart';
+import '../models/protheus.dart';
 
 class MyWidget extends StatefulWidget {
   const MyWidget({super.key});
@@ -52,32 +49,34 @@ class _MyWidgetState extends State<MyWidget> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> children;
+
+    children = const <Widget>[
+      SizedBox(
+        width: 60,
+        height: 100,
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation(Colors.amber),
+        ),
+      ),
+      Padding(
+        padding: EdgeInsets.only(top: 16),
+        child: Text('Aguarde...Efetivando operacão...'),
+      ),
+    ];
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.deepPurple,
-        title: Text(
-          'Future Builder',
+        appBar: AppBar(
+          backgroundColor: Colors.deepPurple,
+          title: Text(
+            'Future Builder',
+          ),
         ),
-      ),
-      body: Container(
-        child: Column(
-          children: [
-            Center(
-              child: ElevatedButton(
-                  onPressed: () {
-                    _getToken();
-                  },
-                  child: Text("ok")),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _getToken();
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: children,
+          ),
+        ));
   }
 }

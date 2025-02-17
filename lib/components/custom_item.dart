@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:whatsappcentral/models/customer.dart';
-import 'package:whatsappcentral/view/customer_form.dart';
+import '/models/customer.dart';
+import '/view/customer_form.dart';
 
 class CustomItem extends StatelessWidget {
   final List<Customer> listCustomer;
@@ -15,7 +15,6 @@ class CustomItem extends StatelessWidget {
               const SizedBox(height: 20),
               Text(
                 'Nenhuma cliente associado!',
-                style: Theme.of(context).textTheme.headline6,
               ),
               const SizedBox(height: 20),
               SizedBox(
@@ -48,20 +47,21 @@ class CustomItem extends StatelessWidget {
                             icon: const Icon(
                               Icons.account_circle_rounded,
                               size: 30,
+                              color: Colors.blue,
                             ),
-                            color: Theme.of(context).errorColor,
                             onPressed: () {},
                           ),
                           title: Text(
                             tr.name,
-                            style: Theme.of(context).textTheme.headline6,
                           ),
                           subtitle: Text(
                             tr.whatsapp,
                           ),
                           trailing: IconButton(
-                            icon: const Icon(Icons.arrow_forward_ios),
-                            color: Theme.of(context).errorColor,
+                            icon: const Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.blue,
+                            ),
                             onPressed: () {},
                           ),
                           iconColor: Colors.white,
