@@ -49,10 +49,12 @@ class _LoginPageState extends State<LoginPage> {
     String token = "";
     String seller = "";
 
+    isLoading = true;
+
     ControlaUsuario conexao = ControlaUsuario();
 
     try {
-      token = await conexao.conectaProtheus();
+      token = await conexao.conectaProtheus().timeout(Duration(seconds: 5));
 
       if (token.isNotEmpty) {
         print("Token gerado  com sucesso:  ${token}");
@@ -67,9 +69,13 @@ class _LoginPageState extends State<LoginPage> {
           content: const Text("Falha ao conectar/autenticar"),
           actions: [
             TextButton(
-              child: const Text("Ok"),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
+                child: const Text("Ok"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  setState(() {
+                    isLoading = false;
+                  });
+                }),
           ],
         ),
       );
@@ -79,19 +85,15 @@ class _LoginPageState extends State<LoginPage> {
           (value) =>
               seller = value.runtimeType == String ? value.toString() : seller,
         );
+    isLoading = false;
 
     if (seller != null && seller.isNotEmpty) {
-      Timer(Duration(seconds: 4), () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ListCustomers(token: token, sales: seller),
-          ),
-        );
-        setState(() {
-          isLogin = false;
-        });
-      });
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ListCustomers(token: token, sales: seller),
+        ),
+      );
     } else {
       showDialog<void>(
         context: context,
@@ -100,9 +102,13 @@ class _LoginPageState extends State<LoginPage> {
           content: const Text("Usuário / Senha inválido"),
           actions: [
             TextButton(
-              child: const Text("Ok"),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
+                child: const Text("Ok"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  setState(() {
+                    isLoading = false;
+                  });
+                }),
           ],
         ),
       );

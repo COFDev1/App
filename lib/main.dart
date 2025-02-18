@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/models/protheus.dart';
 import 'view/logins_screen.dart';
+import 'view/teste.dart';
 // import 'view/teste.dart';
 
 void main() {

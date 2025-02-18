@@ -68,10 +68,12 @@ class _ListContactsState extends State<ListContacts> {
 
   Future<List<Contact>> _list({String id = ""}) async {
     List<Contact> newList = [];
-
+    setState(() => isLoading = true);
     request = await setHeader();
 
-    final response = await http.get(Uri.parse(url + "${id}"), headers: request);
+    final response = await http
+        .get(Uri.parse(url + "${id}"), headers: request)
+        .timeout(Duration(seconds: 10));
 
     widget.lista = [];
 
@@ -88,7 +90,8 @@ class _ListContactsState extends State<ListContacts> {
 
       return newList;
     } else {
-      return Future.error("Erro ao conectar com a Api");
+      // return Future.error("Erro ao conectar com a Api");
+      throw Exception('Falha ao carregar dados...');
     }
   }
 
@@ -312,48 +315,67 @@ class _ListContactsState extends State<ListContacts> {
         appBar: AppBar(
           title: const Text("Meus Contatos"),
         ),
-        body: isLoading
-            ? ShowProcess(
-                message: _message,
-              )
-            : SizedBox(
-                height: availableHeight * 0.8,
-                child: FutureBuilder<List<Contact>>(
-                  future: _list(id: widget.cCustomer),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                      final contato = snapshot.data as List<Contact>;
+        body:
+            // isLoading
+            //     ? ShowProcess(
+            //         message: _message,
+            //       )
+            //     :
+            SizedBox(
+          height: availableHeight * 0.8,
+          child: FutureBuilder<List<Contact>>(
+            future: _list(id: widget.cCustomer),
+            builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                final contato = snapshot.data as List<Contact>;
 
-                      return ContactItem(
-                        listContact: contato,
-                        onRemove: _removeContact,
-                        onOpenForm: _openContactFormModal,
-                      );
-                    } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            FittedBox(
-                              child: Text(
-                                "Não há contatos a serem exibidos",
-                                style: TextStyle(
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
+                return ContactItem(
+                  listContact: contato,
+                  onRemove: _removeContact,
+                  onOpenForm: _openContactFormModal,
+                );
+              } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FittedBox(
+                        child: Text(
+                          "Não há contatos a serem exibidos",
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      );
-                    } else {
-                      return ShowProcess(
-                        message: _message,
-                      );
-                    }
-                  },
-                ),
-              ),
+                      ),
+                    ],
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FittedBox(
+                        child: Text(
+                          "Falha ao carregar os dados",
+                          style: TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                return ShowProcess(
+                  message: _message,
+                );
+              }
+            },
+          ),
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => _openContactFormModal(context),
           child: const Icon(Icons.add),
