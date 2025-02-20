@@ -24,7 +24,14 @@ class SshowProcessState extends State<ShowProcess> {
       ),
       Padding(
         padding: EdgeInsets.only(top: 16),
-        child: Text(widget.message),
+        child: Text(
+          widget.message,
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
       ),
     ];
 

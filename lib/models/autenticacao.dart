@@ -1,6 +1,6 @@
 class Autenticacao {
   static const urlBase =
-      "http://177.174.11.226:8080/rest/"; // http://177.174.11.226:8080 // 192.168.2.12:8083
+      "http://192.168.2.12:8083/rest/"; // http://177.174.11.226:8080 // 192.168.2.12:8083
   static const usuario = 'jesse';
   static const senha = "Oft3870515";
   static const urlLogin = urlBase +

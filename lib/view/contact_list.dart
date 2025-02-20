@@ -23,6 +23,7 @@ class ListContacts extends StatefulWidget {
 class _ListContactsState extends State<ListContacts> {
   String filter = "";
   final String _message = "Aguarde... Listando os Contatos...";
+  var messageResponse = Map();
   bool allOk = false;
   bool hasData = false;
 
@@ -90,7 +91,6 @@ class _ListContactsState extends State<ListContacts> {
 
       return newList;
     } else {
-      // return Future.error("Erro ao conectar com a Api");
       throw Exception('Falha ao carregar dados...');
     }
   }
@@ -99,52 +99,91 @@ class _ListContactsState extends State<ListContacts> {
       {Map<String, dynamic>? contact, Contact? newContact}) async {
     // Gera o token de acesso a Protheus
     request = await setHeader();
-    final response = await http
-        .post(Uri.parse(url + "${id}"),
-            headers: request, body: jsonEncode(contact))
-        .catchError((error) {
+
+    try {
+      final response = await http.post(Uri.parse(url + "${id}"),
+          headers: request, body: jsonEncode(contact));
+
+      if (response.statusCode == 200) {
+        setState(() => isLoading = false);
+        Navigator.of(context).pop();
+        _showDialogOk();
+      } else {
+        messageResponse = jsonDecode(response.body);
+        throw Exception(response.body);
+      }
+    } catch (error) {
       return showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Ocorreu um erro!'),
-          content: const Text("Falha ao cadastrar o contato."),
+          content: Text(
+            messageResponse["message"],
+            style: TextStyle(color: Colors.red),
+          ),
           actions: [
             TextButton(
-              child: const Text('Ok'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
+                child: const Text('Ok'),
+                onPressed: () {
+                  setState(() => isLoading = false);
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                }),
           ],
         ),
       );
-    }).then((value) {
-      setState(() => isLoading = false);
-      allOk = value.statusCode == 200;
-      Navigator.of(context).pop();
-      _showDialogOk();
-    });
+    }
   }
 
-  Future<void> _edit({
-    Map<String, dynamic>? contact,
-    Contact? newContact,
-    String id = "",
-  }) async {
+  Future<void> _edit(
+      {Map<String, dynamic>? contact,
+      Contact? newContact,
+      String id = ""}) async {
     // Gera o token de acesso a Protheus
     request = await setHeader();
 
-    var response = await http.put(Uri.parse(url + "$id"),
-        headers: request, body: jsonEncode(contact));
+    try {
+      var response = await http.put(
+        Uri.parse(url + widget.cCustomer),
+        headers: request,
+        body: jsonEncode(contact),
+      );
 
-    allOk = response.statusCode == 200 || response.statusCode == 201;
-
-    if (allOk) {
-      Navigator.of(context).pop();
-      _showDialogOk();
-      setState(() {
-        int position = widget.lista.indexWhere((element) => element.id == id);
-        setState(() => isLoading = false);
-        widget.lista[position] = newContact!;
-      });
+      if (response.statusCode == 200) {
+        Navigator.of(context).pop();
+        _showDialogOk();
+        setState(() {
+          int position = widget.lista.indexWhere((element) => element.id == id);
+          setState(() => isLoading = false);
+          widget.lista[position] = newContact!;
+        });
+      } else {
+        messageResponse = jsonDecode(response.body);
+        throw Exception(response.body);
+      }
+    } catch (error) {
+      return showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Ocorreu um erro!'),
+          content: Text(
+            messageResponse["message"],
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          actions: [
+            TextButton(
+                child: const Text('Ok'),
+                onPressed: () {
+                  setState(() => isLoading = false);
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                }),
+          ],
+        ),
+      );
     }
   }
 
@@ -171,8 +210,19 @@ class _ListContactsState extends State<ListContacts> {
       return showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Ocorreu um erro!'),
-          content: const Text('Falha ao excluir o contato:'),
+          title: const Text(
+            'Ocorreu um erro!',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: const Text(
+            'Falha ao excluir o contato',
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           actions: [
             TextButton(
                 child: const Text('Ok'),
@@ -189,18 +239,24 @@ class _ListContactsState extends State<ListContacts> {
     }
   }
 
-  Future<void> _validInsert(String phone) async {
-    Map<String, String> listPhone = Map();
-
-    listPhone["phone"] = "27988898998";
-  }
-
   void _showDialogOk() {
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sucesso'),
-        content: const Text('Operacao realizada com sucesso.'),
+        title: const Text(
+          'Sucesso',
+          style: TextStyle(
+            color: Colors.green,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: const Text(
+          'Operação realizada com sucesso!!!',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
           TextButton(
             child: const Text('Ok'),
@@ -211,41 +267,18 @@ class _ListContactsState extends State<ListContacts> {
     );
   }
 
-  void _showDialogErro() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Erro"),
-          content: const Text(
-            "Falha ao efetivar a operação!!!",
-            style: TextStyle(color: Colors.red),
-          ),
-
-          // style: TextStyle(color: Colors.red)
-          actions: <Widget>[
-            TextButton(
-              child: const Text("Ok"),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _updateContact(
     Map<String, dynamic> details,
     int operation,
     BuildContext context,
   ) {
-    final String id =
+    final String identifier =
         details["index"] != -1 ? widget.lista[details["index"]].id : "";
 
     details.remove("index");
 
     final Contact newContact = Contact(
-      id: id,
+      id: identifier,
       name: details["name"],
       phone: details["phone"],
       type: details["tipo"],
@@ -261,7 +294,7 @@ class _ListContactsState extends State<ListContacts> {
       case 4:
         operation == 3
             ? _add(contact: details, newContact: newContact)
-            : _edit(contact: details, newContact: newContact, id: id);
+            : _edit(contact: details, newContact: newContact, id: identifier);
         break;
 
       case 5:
@@ -317,10 +350,9 @@ class _ListContactsState extends State<ListContacts> {
         ),
         body:
             // isLoading
-            //     ? ShowProcess(
-            //         message: _message,
-            //       )
-            //     :
+            // ? ShowProcess(
+            //     message: _message,
+            //   ):
             SizedBox(
           height: availableHeight * 0.8,
           child: FutureBuilder<List<Contact>>(
