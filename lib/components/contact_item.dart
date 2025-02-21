@@ -15,7 +15,6 @@ class ContactItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Contact> teste = [];
     return LayoutBuilder(builder: (ctx, constraints) {
       return Container(
         height: constraints.maxHeight,
@@ -38,13 +37,18 @@ class ContactItem extends StatelessWidget {
                     child: Text(
                       '${element.id}',
                       style: const TextStyle(
-                        color: Colors.black,
-                      ),
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
                 title: Text(
                   element.name,
+                  style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(element.phone),
                 trailing: PopupMenuButton(

@@ -22,10 +22,11 @@ class ControlaUsuario {
     }
   }
 
-  Future<String?> validUser(String user, String password, String token) async {
+  Future<Map<String, dynamic>?> validUser(
+      String user, String password, String token) async {
     Map<String, String> dataCustomer = {};
     dataCustomer["user"] = user;
-    dataCustomer["password"] = password; //
+    dataCustomer["password"] = password;
 
     Map<String, String> request = {
       'Content-Type': 'application/json',
@@ -39,18 +40,18 @@ class ControlaUsuario {
     );
 
     try {
-      print('value: $response');
       if (response.statusCode == 200) {
         final seller = jsonDecode(response.body);
 
         print("Codigo do retorno da conexao: ${seller["seller"]}");
+        print("Nome do vendedor: ${seller["name"]}");
 
-        return jsonDecode(response.body)["seller"].toString();
+        return jsonDecode(response.body);
+      } else {
+        throw Exception(response.body);
       }
-    } catch (err) {
-      print("Erroretornado $err");
-
-      return ("Usuário/senha inválido: $err");
+    } catch (error) {
+      throw Exception('$error');
     }
   }
 }

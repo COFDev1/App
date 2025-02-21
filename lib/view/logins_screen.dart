@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../components/controlaUsuario.dart';
 import '../components/show_process.dart';
 import 'list_customers.dart';
+import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -48,6 +49,7 @@ class _LoginPageState extends State<LoginPage> {
   void login() async {
     String token = "";
     String seller = "";
+    String name = "";
 
     isLoading = true;
 
@@ -62,57 +64,53 @@ class _LoginPageState extends State<LoginPage> {
         throw Exception();
       }
     } catch (e) {
-      throw showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text("Ocorreu um erro!"),
-          content: const Text("Falha ao conectar/autenticar"),
-          actions: [
-            TextButton(
-                child: const Text("Ok"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  setState(() {
-                    isLoading = false;
-                  });
-                }),
-          ],
-        ),
-      );
+      throw _showMessageValidation(message: "Falha ao conectar/autenticar");
     }
 
-    await conexao.validUser(user.text.trim(), senha.text.trim(), token).then(
-          (value) =>
-              seller = value.runtimeType == String ? value.toString() : seller,
-        );
-    isLoading = false;
+    print("Passou 1 ");
 
-    if (seller != null && seller.isNotEmpty) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ListCustomers(token: token, sales: seller),
+    await conexao
+        .validUser(user.text.trim(), senha.text.trim(), token)
+        .then((value) => {
+              isLoading = false,
+              seller = value?["seller"],
+              name = value!["name"],
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ListCustomers(
+                    token: token,
+                    sales: seller,
+                    name: name,
+                  ),
+                ),
+              )
+            })
+        .catchError((error) {
+      throw _showMessageValidation(message: "Usuário/Senha incorreto");
+    });
+  }
+
+  Future<void> _showMessageValidation({String message = ""}) {
+    return showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Ocorreu um erro!"),
+        content: Text(
+          message,
         ),
-      );
-    } else {
-      showDialog<void>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text("Atenção"),
-          content: const Text("Usuário / Senha inválido"),
-          actions: [
-            TextButton(
-                child: const Text("Ok"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  setState(() {
-                    isLoading = false;
-                  });
-                }),
-          ],
-        ),
-      );
-    }
+        actions: [
+          TextButton(
+              child: const Text("Ok"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  isLoading = false;
+                });
+              }),
+        ],
+      ),
+    );
   }
 
   @override

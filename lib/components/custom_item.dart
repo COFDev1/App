@@ -53,16 +53,30 @@ class CustomItem extends StatelessWidget {
                           ),
                           title: Text(
                             tr.name,
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold),
                           ),
-                          subtitle: Text(
-                            tr.whatsapp,
+                          subtitle: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text(
+                              tr.whatsapp,
+                            ),
                           ),
                           trailing: IconButton(
                             icon: const Icon(
                               Icons.arrow_forward_ios,
                               color: Colors.blue,
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CustomerForm(customer: tr),
+                                ),
+                              );
+                            },
                           ),
                           iconColor: Colors.white,
                           textColor: Colors.black,

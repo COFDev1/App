@@ -10,10 +10,12 @@ import 'dart:convert';
 class ListCustomers extends StatefulWidget {
   final String token;
   final String sales;
+  final String name;
 
-  const ListCustomers({
+  ListCustomers({
     required this.token,
     required this.sales,
+    this.name = '',
     super.key,
   });
 
@@ -99,10 +101,13 @@ class _ListCustomersState extends State<ListCustomers> {
 
   @override
   Widget build(BuildContext context) {
-    // final List<Customer> listCustomers = dummyCustomer.toList();
+    late String name = widget.name;
+
+    print(widget.sales);
+
     final mediaQuery = MediaQuery.of(context);
     final PreferredSizeWidget appBar = AppBar(
-      title: const Text("Listagem de Clientes"),
+      title: Text('Olá, $name'),
       actions: [
         IconButton(
           icon: const Icon(

@@ -131,10 +131,11 @@ class _ContactFormState extends State<ContactForm> {
           _addEdit ? "Gravação" : "Exclusão",
           style: TextStyle(color: _addEdit ? Colors.black : Colors.red),
         ),
-        content: const Text("Deseja confirmar a operação ?"),
+        content: const Text("Deseja confirmar a operação ?",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         actions: <Widget>[
           TextButton(
-            onPressed: () {
+            onPressed: () { 
               Navigator.of(context).pop();
               setState(() => isLoading = true);
               widget.onSubmit(detailsContact, operation, context);

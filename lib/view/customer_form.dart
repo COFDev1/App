@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/customer.dart';
 import '../view/contact_list.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 enum FilterOptions {
   add_contact,
@@ -161,50 +159,6 @@ class _CustomerFormState extends State<CustomerForm> {
                                 TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
-                        // Padding(
-                        //   padding: const EdgeInsets.all(15.0),
-                        //   child: Column(
-                        //     children: [],
-                        //   ),
-                        // ),
-                        // Padding(
-                        //   padding: const EdgeInsets.only(top: 16.0),
-                        //   child: TextField(
-                        //     controller: name,
-                        //     onSubmitted: (_) => {},
-                        //     decoration: InputDecoration(labelText: 'Nome'),
-                        //   ),
-                        // ),
-                        // Padding(
-                        //   padding: const EdgeInsets.only(top: 16.0),
-                        //   child: TextField(
-                        //     controller: whastApp,
-                        //     onSubmitted: (_) => {},
-                        //     decoration: InputDecoration(labelText: 'WhatsApp'),
-                        //     keyboardType:
-                        //         TextInputType.numberWithOptions(decimal: true),
-                        //   ),
-                        // ),
-                        // Padding(
-                        //   padding: const EdgeInsets.only(top: 16.0),
-                        //   child: TextField(
-                        //     controller: whastApp,
-                        //     onSubmitted: (_) => {},
-                        //     decoration: InputDecoration(labelText: 'Teste'),
-                        //     keyboardType:
-                        //         TextInputType.numberWithOptions(decimal: true),
-                        //   ),
-                        // ),
-                        // Padding(
-                        //   padding: const EdgeInsets.only(top: 16.0),
-                        //   child: TextField(
-                        //     controller: whastApp,
-                        //     onSubmitted: (_) => {},
-                        //     decoration: InputDecoration(labelText: 'Teste 123'),
-                        //     keyboardType:
-                        //         TextInputType.numberWithOptions(decimal: true),
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),
