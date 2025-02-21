@@ -21,14 +21,17 @@ class _LoginPageState extends State<LoginPage> {
 
   bool isLogin = true;
   late String titulo;
+  late Map messageResponse;
   late String actionButton;
   late String toggleButton;
+
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     setFormAction(true);
+    messageResponse = Map();
   }
 
   setFormAction(bool acao) {
@@ -55,40 +58,37 @@ class _LoginPageState extends State<LoginPage> {
 
     ControlaUsuario conexao = ControlaUsuario();
 
+    // Gera o token no Protheus
     try {
       token = await conexao.conectaProtheus().timeout(Duration(seconds: 5));
-
-      if (token.isNotEmpty) {
-        print("Token gerado  com sucesso:  ${token}");
-      } else {
+      if (token.isEmpty) {
         throw Exception();
       }
     } catch (e) {
       throw _showMessageValidation(message: "Falha ao conectar/autenticar");
     }
 
-    print("Passou 1 ");
+    // Valida o usuário do vendedor
+    try {
+      final response =
+          await conexao.validUser(user.text.trim(), senha.text.trim(), token);
 
-    await conexao
-        .validUser(user.text.trim(), senha.text.trim(), token)
-        .then((value) => {
-              isLoading = false,
-              seller = value?["seller"],
-              name = value!["name"],
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ListCustomers(
-                    token: token,
-                    sales: seller,
-                    name: name,
-                  ),
-                ),
-              )
-            })
-        .catchError((error) {
-      throw _showMessageValidation(message: "Usuário/Senha incorreto");
-    });
+      seller = response?["seller"];
+      name = response!["name"];
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ListCustomers(
+            token: token,
+            sales: seller,
+            name: name,
+          ),
+        ),
+      );
+    } catch (e) {
+      throw _showMessageValidation(message: conexao.messageResponse["message"]);
+    }
   }
 
   Future<void> _showMessageValidation({String message = ""}) {

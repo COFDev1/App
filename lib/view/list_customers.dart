@@ -107,7 +107,7 @@ class _ListCustomersState extends State<ListCustomers> {
 
     final mediaQuery = MediaQuery.of(context);
     final PreferredSizeWidget appBar = AppBar(
-      title: Text('Olá, $name'),
+      title: Text('Olá, $name !'),
       actions: [
         IconButton(
           icon: const Icon(

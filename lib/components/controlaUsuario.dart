@@ -4,6 +4,8 @@ import 'dart:async';
 import 'dart:convert';
 
 class ControlaUsuario {
+  late Map messageResponse = {};
+
   Future<String> conectaProtheus() async {
     var response = await http.post(Uri.parse(Autenticacao.urlLogin));
 
@@ -46,8 +48,10 @@ class ControlaUsuario {
         print("Codigo do retorno da conexao: ${seller["seller"]}");
         print("Nome do vendedor: ${seller["name"]}");
 
-        return jsonDecode(response.body);
+        return messageResponse = jsonDecode(response.body);
       } else {
+        messageResponse = jsonDecode(response.body);
+
         throw Exception(response.body);
       }
     } catch (error) {
