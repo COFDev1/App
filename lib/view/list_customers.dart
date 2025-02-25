@@ -147,14 +147,16 @@ class _ListCustomersState extends State<ListCustomers> {
                           // width: mediaQuery.size.width * 0.8,
                           child: Column(
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: TextField(
-                                  onChanged: _filter,
-                                  onSubmitted: (_) => {},
-                                  decoration: InputDecoration(
-                                    labelText: 'Nome',
-                                    suffix: Icon(Icons.search),
+                              SingleChildScrollView(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: TextField(
+                                    onChanged: _filter,
+                                    onSubmitted: (_) => {},
+                                    decoration: InputDecoration(
+                                      labelText: 'Nome',
+                                      suffix: Icon(Icons.search),
+                                    ),
                                   ),
                                 ),
                               )

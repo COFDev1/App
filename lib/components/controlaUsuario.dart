@@ -13,8 +13,6 @@ class ControlaUsuario {
       if (response.statusCode == 201) {
         final decodedMap = jsonDecode(response.body);
 
-        print("Codigo do retorno da conexao: ${response.statusCode}");
-
         return decodedMap["access_token"];
       } else {
         throw Exception("Falha de conexao com o Protheus");
@@ -43,11 +41,6 @@ class ControlaUsuario {
 
     try {
       if (response.statusCode == 200) {
-        final seller = jsonDecode(response.body);
-
-        print("Codigo do retorno da conexao: ${seller["seller"]}");
-        print("Nome do vendedor: ${seller["name"]}");
-
         return messageResponse = jsonDecode(response.body);
       } else {
         messageResponse = jsonDecode(response.body);

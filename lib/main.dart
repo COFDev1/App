@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/models/protheus.dart';
-import 'view/logins_screen.dart';
-import 'view/teste.dart';
-// import 'view/teste.dart';
+import 'view/splash.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,7 +20,9 @@ class MyApp extends StatelessWidget {
     );
 
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => Protheus())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => Protheus()),
+      ],
       child: MaterialApp(
         title: "Relacionamento com o Cliente",
         theme: ThemeData(
@@ -38,12 +38,8 @@ class MyApp extends StatelessWidget {
             backgroundColor: Colors.blue,
           ),
         ),
-
-        home: LoginPage(), // ListCustomers() LoginPage() MyWidget()
-        routes: {
-          // AppRoutes.listContact: (ctx) =>
-          //     ListContacts(lista: [], cCustomer: ""),
-        },
+        home: Splash(),
+        routes: {},
         debugShowCheckedModeBanner: false,
       ),
     );
