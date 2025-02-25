@@ -31,10 +31,17 @@ class _SplashState extends State<Splash> {
       builder: (ctx, constraints) {
         return Column(
           children: [
-            Image.asset(
-              'assets/images/login.gif',
-              height: constraints.maxHeight,
-            )
+            Stack(children: [
+              Container(
+                height: constraints.maxHeight,
+                color: Colors.white,
+              ),
+              Image.asset(
+                'assets/images/login.gif',
+                height: constraints.maxHeight,
+                // fit: BoxFit.fill,
+              ),
+            ])
           ],
         );
       },
