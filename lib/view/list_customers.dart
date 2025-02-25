@@ -27,6 +27,8 @@ class _ListCustomersState extends State<ListCustomers> {
   List<Customer> listCustomers = [];
   List<Customer> copyListCustomers = [];
 
+  Future<List<Customer>>? futureCustomers;
+
   bool loading = false;
 
   @override
@@ -35,7 +37,7 @@ class _ListCustomersState extends State<ListCustomers> {
 
     setState(() => loading = true);
 
-    loadCustomer();
+    futureCustomers = loadCustomer();
   }
 
   void _filter(String valueSearch) {
@@ -54,7 +56,7 @@ class _ListCustomersState extends State<ListCustomers> {
     });
   }
 
-  Future<void> loadCustomer() async {
+  Future<List<Customer>> loadCustomer() async {
     String token = widget.token;
     String saller = widget.sales;
 
@@ -63,40 +65,45 @@ class _ListCustomersState extends State<ListCustomers> {
       'Authorization': 'Bearer $token'
     };
 
-    final response =
-        await http.get(Uri.parse(Autenticacao.urlCustomers + saller), headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    });
+    try {
+      final response = await http
+          .get(Uri.parse(Autenticacao.urlCustomers + saller), headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      });
 
-    print("Lendo os dados do produto $response");
+      print("Lendo os dados do produto $response");
 
-    if (response.body == 'null') return;
-    Map<String, dynamic> data = jsonDecode(response.body);
+      if (response.body == 'null') return [];
+      Map<String, dynamic> data = jsonDecode(response.body);
 
-    print('Valor retornado: $response.body');
+      print('Valor retornado: $response.body');
 
-    data["items"].forEach((element) {
-      listCustomers.add(
-        Customer(
-          id: element["codigo"],
-          name: element["nome"],
-          whatsapp: element["tel"],
-          address: element["endco"],
-          burgh: element["bairro"],
-          city: element["municipio"],
-          complement: element["compl"],
-          state: element["uf"],
-          zipcode: element["cep"],
-        ),
-      );
-    });
+      data["items"].forEach((element) {
+        listCustomers.add(
+          Customer(
+            id: element["codigo"],
+            name: element["nome"],
+            whatsapp: element["tel"],
+            address: element["endco"],
+            burgh: element["bairro"],
+            city: element["municipio"],
+            complement: element["compl"],
+            state: element["uf"],
+            zipcode: element["cep"],
+          ),
+        );
+      });
 
-    if (listCustomers.isNotEmpty) {
-      setState(() => loading = false);
+      if (listCustomers.isNotEmpty) {
+        setState(() => loading = false);
+      }
+      // return List<Customer>.from(listCustomers);
+      return copyListCustomers = List<Customer>.from(listCustomers);
+    } catch (error) {
+      return Future.error("Falha ao estabelecer conexão");
     }
-    copyListCustomers = List.from(listCustomers);
   }
 
   @override
@@ -132,56 +139,63 @@ class _ListCustomersState extends State<ListCustomers> {
     return SafeArea(
       child: Scaffold(
         appBar: appBar,
-        body: loading
-            ? ShowProcess(
-                message: "Aguarde...Buscando os clientes... ",
-              )
-            : Column(
-                children: [
-                  SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        SizedBox(
-                          height: availableHeight * 0.12,
-                          // width: mediaQuery.size.width * 0.8,
-                          child: Column(
-                            children: [
-                              SingleChildScrollView(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: TextField(
-                                    onChanged: _filter,
-                                    onSubmitted: (_) => {},
-                                    decoration: InputDecoration(
-                                      labelText: 'Nome',
-                                      suffix: Icon(Icons.search),
+        body: FutureBuilder(
+            future: futureCustomers,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                // final customers = snapshot.data as List<Customer>;
+                return Column(
+                  children: [
+                    SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SizedBox(
+                            height: availableHeight * 0.12,
+                            // width: mediaQuery.size.width * 0.8,
+                            child: Column(
+                              children: [
+                                SingleChildScrollView(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: TextField(
+                                      onChanged: _filter,
+                                      onSubmitted: (_) => {},
+                                      decoration: InputDecoration(
+                                        labelText: 'Nome',
+                                        suffix: Icon(Icons.search),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              )
-                            ],
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                        SizedBox(
-                          height: availableHeight * 0.80,
-                          child: InkWell(
-                            child: CustomItem(listCustomer: listCustomers),
+                          SizedBox(
+                            height: availableHeight * 0.80,
+                            child: InkWell(
+                              child: CustomItem(listCustomer: listCustomers),
+                            ),
                           ),
-                        ),
-                        // SizedBox(
-                        //   height: availableHeight * 0.05,
-                        //   child: FloatingActionButton(
-                        //     onPressed: () => print("Ok..."),
-                        //     elevation: 5,
-                        //     child: const Icon(Icons.add),
-                        //   ),
-                        // ),
-                      ],
+                          // SizedBox(
+                          //   height: availableHeight * 0.05,
+                          //   child: FloatingActionButton(
+                          //     onPressed: () => print("Ok..."),
+                          //     elevation: 5,
+                          //     child: const Icon(Icons.add),
+                          //   ),
+                          // ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                );
+              } else {
+                return ShowProcess(
+                  message: "Aguarde...Buscando os clientes... ",
+                );
+              }
+            }),
       ),
     );
   }

@@ -12,9 +12,13 @@ class CustomItem extends StatelessWidget {
     return listCustomer.isEmpty
         ? Column(
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               Text(
                 'Nenhuma cliente associado!',
+                style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20),
               ),
               const SizedBox(height: 20),
               SizedBox(
