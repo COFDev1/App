@@ -92,7 +92,7 @@ class _ContactFormState extends State<ContactForm> {
       "2 - Residencial",
       "3 - Celular",
       "4 - WhatsApp",
-      "5 - Fax comercial",
+      "5 - Outros",
     ];
     return options;
   }
@@ -135,7 +135,7 @@ class _ContactFormState extends State<ContactForm> {
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         actions: <Widget>[
           TextButton(
-            onPressed: () { 
+            onPressed: () {
               Navigator.of(context).pop();
               setState(() => isLoading = true);
               widget.onSubmit(detailsContact, operation, context);
@@ -288,7 +288,7 @@ class _ContactFormState extends State<ContactForm> {
                               Map<String, dynamic> form = {};
 
                               form["index"] = widget.index;
-                              form["name"] = _nameController.text;
+                              form["name"] = _nameController.text.toUpperCase();
                               form["phone"] = _phoneController.text;
                               form["tipo"] = dropdownValue;
                               form["descricao"] = dropdownLevelValue;

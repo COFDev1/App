@@ -14,7 +14,7 @@ class CustomItem extends StatelessWidget {
             children: [
               const SizedBox(height: 40),
               Text(
-                'Nenhuma cliente associado!',
+                'Nenhuma cliente encontrado!',
                 style: TextStyle(
                     color: Colors.red,
                     fontWeight: FontWeight.bold,

@@ -60,11 +60,6 @@ class _ListCustomersState extends State<ListCustomers> {
     String token = widget.token;
     String saller = widget.sales;
 
-    Map<String, String> request = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token'
-    };
-
     try {
       final response = await http
           .get(Uri.parse(Autenticacao.urlCustomers + saller), headers: {
@@ -110,28 +105,26 @@ class _ListCustomersState extends State<ListCustomers> {
   Widget build(BuildContext context) {
     late String name = widget.name;
 
-    print(widget.sales);
+    final listAction = [
+      PopupMenuButton(
+        icon: const Icon(Icons.more_vert),
+        itemBuilder: (_) => [
+          PopupMenuItem(
+              value: "logout",
+              child: Text("Sair"),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => LoginPage()),
+                );
+              }),
+        ],
+      )
+    ];
 
     final mediaQuery = MediaQuery.of(context);
-    final PreferredSizeWidget appBar = AppBar(
-      title: Text('Olá, $name !'),
-      actions: [
-        IconButton(
-          icon: const Icon(
-            Icons.logout,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => LoginPage(),
-              ),
-            );
-          },
-        )
-      ],
-    );
+    final PreferredSizeWidget appBar =
+        AppBar(title: Text('Olá, $name !'), actions: listAction);
     final availableHeight = mediaQuery.size.height -
         appBar.preferredSize.height -
         mediaQuery.padding.top;

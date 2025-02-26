@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../components/show_process.dart';
+import 'package:newapp/components/show_process.dart';
 import '../components/contact_form.dart';
 import '../components/contact_item.dart';
 import '../models/autenticacao.dart';
