@@ -68,8 +68,6 @@ class _ListCustomersState extends State<ListCustomers> {
         'Authorization': 'Bearer $token',
       });
 
-      print("Lendo os dados do produto $response");
-
       if (response.body == 'null') return [];
       Map<String, dynamic> data = jsonDecode(response.body);
 

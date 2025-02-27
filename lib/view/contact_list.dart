@@ -39,10 +39,12 @@ class _ListContactsState extends State<ListContacts> {
     Map<String, String> header = {};
     String token = "";
 
+    print('URL dos contatos: $url');
+
     await Provider.of<Protheus>(context, listen: false)
         .getToken()
         .catchError((error) {
-      return showDialog<void>(
+      throw showDialog<void>(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text("Erro"),
@@ -58,7 +60,7 @@ class _ListContactsState extends State<ListContacts> {
     }).then((value) {
       token = value["token"];
 
-      print("Resultado do provider: ${value}");
+      print('Resultado do provider: $value');
 
       header["Content-Type"] = "application/json";
       header["Authorization"] = "Bearer $token";
