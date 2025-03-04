@@ -17,24 +17,16 @@ class CustomerForm extends StatefulWidget {
 }
 
 class _CustomerFormState extends State<CustomerForm> {
-  late final _nameController =
-      TextEditingController(text: widget.customer.name);
-  late final _adressController =
-      TextEditingController(text: widget.customer.address);
-  late final _whastAppController =
-      TextEditingController(text: widget.customer.whatsapp);
-  late final _burghController =
-      TextEditingController(text: widget.customer.burgh);
-  late final _cityController =
-      TextEditingController(text: widget.customer.city);
+  late final _nameController = TextEditingController(text: widget.customer.name);
+  late final _adressController = TextEditingController(text: widget.customer.address);
+  late final _whastAppController = TextEditingController(text: widget.customer.whatsapp);
+  late final _burghController = TextEditingController(text: widget.customer.burgh);
+  late final _cityController = TextEditingController(text: widget.customer.city);
 
-  late final _complementController =
-      TextEditingController(text: widget.customer.complement);
+  late final _complementController = TextEditingController(text: widget.customer.complement);
 
-  late final _zipcodeController =
-      TextEditingController(text: widget.customer.zipcode);
-  late final _stateController =
-      TextEditingController(text: widget.customer.state);
+  late final _zipcodeController = TextEditingController(text: widget.customer.zipcode);
+  late final _stateController = TextEditingController(text: widget.customer.state);
 
   @override
   Widget build(BuildContext context) {
@@ -65,12 +57,11 @@ class _CustomerFormState extends State<CustomerForm> {
       actions: actions,
     );
 
-    final availableHeight = mediaQuery.size.height -
-        appBar.preferredSize.height -
-        mediaQuery.padding.top;
+    final availableHeight = mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top;
 
     return Scaffold(
         appBar: appBar,
+        resizeToAvoidBottomInset: false,
         body: LayoutBuilder(builder: (ctx, constraints) {
           return Padding(
             padding: const EdgeInsets.all(16),
@@ -97,8 +88,7 @@ class _CustomerFormState extends State<CustomerForm> {
                             onSubmitted: (_) => {},
                             readOnly: true,
                             decoration: InputDecoration(labelText: 'Endereço'),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: false),
+                            keyboardType: TextInputType.numberWithOptions(decimal: false),
                           ),
                         ),
                         Padding(
@@ -131,10 +121,8 @@ class _CustomerFormState extends State<CustomerForm> {
                             controller: _complementController,
                             readOnly: true,
                             onSubmitted: (_) => {},
-                            decoration:
-                                InputDecoration(labelText: 'Complemento'),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
+                            decoration: InputDecoration(labelText: 'Complemento'),
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
                         Padding(
@@ -144,8 +132,7 @@ class _CustomerFormState extends State<CustomerForm> {
                             readOnly: true,
                             onSubmitted: (_) => {},
                             decoration: InputDecoration(labelText: 'Cep'),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
                         Padding(
@@ -155,8 +142,7 @@ class _CustomerFormState extends State<CustomerForm> {
                             readOnly: true,
                             onSubmitted: (_) => {},
                             decoration: InputDecoration(labelText: 'Estado'),
-                            keyboardType:
-                                TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
                           ),
                         ),
                       ],
