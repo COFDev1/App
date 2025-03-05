@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:newapp/components/citys_item.dart';
-import 'package:newapp/view/teste.dart';
+import 'package:newapp/components/filter_citys.dart';
 import '../components/show_process.dart';
 import '../models/autenticacao.dart';
 import '../models/customer.dart';
@@ -54,7 +54,10 @@ class _ListCustomersState extends State<ListCustomers> {
     if (valueSearch.isEmpty) {
       results = copyListCustomers;
     } else {
-      results = listCustomers.where((user) => user.name.toLowerCase().contains(valueSearch.toLowerCase())).toList();
+      // results = listCustomers.where((user) => user.name.toLowerCase().contains(valueSearch.toLowerCase())).toList();
+      results = listCustomers.where((user) {
+        return user.name.toLowerCase().contains(valueSearch.toLowerCase());
+      }).toList();
     }
     setState(() {
       listCustomers = results;
@@ -99,15 +102,15 @@ class _ListCustomersState extends State<ListCustomers> {
       'Tatu',
       'Marta',
       'Maria',
-      'aline',
-      'adriana',
-      'adrileia',
-      'Tatu',
-      'Marta',
-      'Maria',
-      'aline',
-      'adriana',
-      'adrileia',
+      'Pedro',
+      'Amanda',
+      'Joao',
+      'Antonia',
+      'Sandra',
+      'Jose',
+      'Rose',
+      'Roberta',
+      'Aline',
     ];
     late final nameController = TextEditingController(text: "TEST");
     List<List<String>> listsData = [
@@ -117,9 +120,7 @@ class _ListCustomersState extends State<ListCustomers> {
       ['Item P', 'Item Q', 'Item R'],
       ['Item M', 'Item N', 'Item O'],
     ];
-    final heightDevice = (MediaQuery.of(context).size.height / 2);
 
-    // BottomSheetApp();
     bool checkboxValue2 = true;
 
     // showModalBottomSheet(
@@ -172,15 +173,17 @@ class _ListCustomersState extends State<ListCustomers> {
     //   builder: (context) => CardList(listData: _userOptions),
     // );
 
-    showModalBottomSheet(
+    showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
-      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.5),
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.75),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
       ),
       builder: (context) => CardList(listData: _userOptions),
-    );
+    ).then((onValue) {
+      print('Resultado $onValue');
+    });
   }
 
   Future<List<Customer>> loadCustomer() async {
@@ -287,9 +290,9 @@ class _ListCustomersState extends State<ListCustomers> {
                                                     onPressed: () {
                                                       BottomSheetExample();
                                                     },
-                                                    icon: Icon(
-                                                      Icons.format_list_bulleted_rounded,
-                                                    ))
+                                                    icon: Icon(Icons.filter_alt_outlined,
+                                                        color: Colors.blue // color: Colors.green) // format_list_bulleted_rounded
+                                                        ))
                                                 // suffix: Icon(Icons.search),
                                                 // prefix: IconButton(
                                                 //   icon: const Icon(
@@ -302,27 +305,6 @@ class _ListCustomersState extends State<ListCustomers> {
                                                 ),
                                           ),
                                         ),
-                                        // Expanded(
-                                        //   child: SizedBox(
-                                        //     width: mediaQuery.size.width,
-                                        //   ),
-                                        // ),
-                                        // Expanded(
-                                        //   child: DropdownButton<String>(
-                                        //       items: _cidades.map((String dropDownStringItem) {
-                                        //         return DropdownMenuItem<String>(
-                                        //           value: dropDownStringItem,
-                                        //           child: Text(dropDownStringItem),
-                                        //         );
-                                        //       }).toList(),
-                                        //       onChanged: (String? novoItemSelecionado) {
-                                        //         //  _dropDownItemSelected(novoItemSelecionado);
-                                        //         setState(() {
-                                        //           this._itemSelecionado = novoItemSelecionado as String;
-                                        //         });
-                                        //       },
-                                        //       value: _itemSelecionado),
-                                        // )
                                       ],
                                     ),
                                   ),
