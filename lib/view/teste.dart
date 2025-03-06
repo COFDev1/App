@@ -16,6 +16,44 @@ class _CardListState extends State<CardList> {
 
   late TextEditingController controller;
 
+  Widget setFieldSearch() {
+    return TextField(
+      controller: controller,
+      // focusNode: focusNode,
+      // onEditingComplete: onEditingComplete,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        hintText: "Informe a cidade",
+        prefixIcon: Icon(Icons.search),
+      ),
+    );
+  }
+
+// Widget _createSectionContainer(Widget child) {
+//     return Container(
+//       width: 330,
+//       height: 200,
+//       padding: const EdgeInsets.all(10),
+//       margin: const EdgeInsets.all(10),
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         border: Border.all(color: Colors.grey),
+//         borderRadius: BorderRadius.circular(10),
+//       ),
+//       child: child,
+//     );
+//   }
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -72,27 +110,7 @@ class _CardListState extends State<CardList> {
                   fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
                     this.controller = controller;
 
-                    return TextField(
-                      controller: controller,
-                      // focusNode: focusNode,
-                      // onEditingComplete: onEditingComplete,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey[300]!),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey[300]!),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey[300]!),
-                        ),
-                        hintText: "Informe a cidade",
-                        prefixIcon: Icon(Icons.search),
-                      ),
-                    );
+                    return setFieldSearch();
                   },
                 )
               ],

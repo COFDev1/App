@@ -30,7 +30,9 @@ class ListCustomers extends StatefulWidget {
 class _ListCustomersState extends State<ListCustomers> {
   List<Customer> listCustomers = [];
   List<Customer> copyListCustomers = [];
-  var _cidades = ['Nome', 'Estado', 'Cidade', 'Bairro'];
+  List<String> listNeighborhood = [];
+  List<String> listCitys = [];
+
   var _itemSelecionado = 'Nome';
   SingingCharacter? _character = SingingCharacter.lafayette;
 
@@ -180,7 +182,11 @@ class _ListCustomersState extends State<ListCustomers> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
       ),
-      builder: (context) => CardList(listData: _userOptions),
+      builder: (context) => CardList(
+        listData: listCustomers,
+        listCitys: listCitys,
+        listNeighborhood: listNeighborhood,
+      ),
     ).then((onValue) {
       print('Resultado $onValue');
     });
@@ -206,7 +212,7 @@ class _ListCustomersState extends State<ListCustomers> {
         listCustomers.add(
           Customer(
             id: element["codigo"],
-            name: element["nome"],
+            name: element["codigo"] + " - " + element["nome"],
             whatsapp: element["tel"],
             address: element["endco"],
             burgh: element["bairro"],
@@ -216,13 +222,21 @@ class _ListCustomersState extends State<ListCustomers> {
             zipcode: element["cep"],
           ),
         );
+
+        if (listNeighborhood.indexWhere((x) => x.toUpperCase() == element["bairro"].toUpperCase()) < 0) {
+          listNeighborhood.add(element["bairro"].toUpperCase());
+        }
+        if (listCitys.indexWhere((x) => x.toUpperCase() == element["municipio"].toUpperCase()) < 0) {
+          listCitys.add(element["municipio"].toUpperCase());
+        }
       });
 
       if (listCustomers.isNotEmpty) {
         setState(() => loading = false);
       }
-      // return List<Customer>.from(listCustomers);
-      return copyListCustomers = List<Customer>.from(listCustomers);
+      copyListCustomers = List<Customer>.from(listCustomers);
+
+      return copyListCustomers;
     } catch (error) {
       return Future.error("Falha ao estabelecer conexão");
     }
@@ -285,7 +299,7 @@ class _ListCustomersState extends State<ListCustomers> {
                                             onChanged: _filter,
                                             // onSubmitted: (_) => {_dialogBuilder(context)},
                                             decoration: InputDecoration(
-                                                labelText: 'Nome',
+                                                labelText: 'Código / Nome',
                                                 suffixIcon: IconButton(
                                                     onPressed: () {
                                                       BottomSheetExample();

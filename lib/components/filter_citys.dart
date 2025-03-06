@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:newapp/models/customer.dart';
 
 class CardList extends StatefulWidget {
-  final List<String> listData;
+  final List<Customer> listData;
+  final List<String> listCitys;
+  final List<String> listNeighborhood;
 
-  CardList({required this.listData});
+  CardList({
+    required this.listData,
+    required this.listCitys,
+    required this.listNeighborhood,
+  });
 
   @override
   State<CardList> createState() => _CardListState();
@@ -12,8 +19,10 @@ class CardList extends StatefulWidget {
 class _CardListState extends State<CardList> {
   bool isLoading = false;
 
-  late List<String> autoCompleteData = widget.listData;
-  late List<String> copyListData = widget.listData;
+  late List<Customer> autoCompleteData = widget.listData;
+  late List<Customer> copyListData = widget.listData;
+  late List<String> citys = widget.listCitys;
+  late List<String> neighborhood = widget.listNeighborhood;
 
   late TextEditingController controller;
 
@@ -56,6 +65,8 @@ class _CardListState extends State<CardList> {
 //     );
 //   }
 
+  static String _displayStringForOption(Customer option) => option.city;
+
   @override
   Widget build(BuildContext context) {
     print('Itens passados: $autoCompleteData');
@@ -76,92 +87,136 @@ class _CardListState extends State<CardList> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                Autocomplete<String>(
-                  // displayStringForOption: _displayStringForOption,
-                  optionsBuilder: (TextEditingValue textEditingValue) {
-                    if (textEditingValue.text.isEmpty) {
-                      return const Iterable<String>.empty();
-                    } else {
-                      // return autoCompleteData.where(
-                      //   (word) => word.toLowerCase().contains(textEditingValue.text.toLowerCase()),
-                      // );
+                // Autocomplete<Customer>(
+                //   // displayStringForOption: _displayStringForOption,
+                //   displayStringForOption: _displayStringForOption,
+                //   optionsBuilder: (TextEditingValue textEditingValue) {
+                //     if (textEditingValue.text.isEmpty) {
+                //       return const Iterable<Customer>.empty();
+                //     } else {
+                //       // return autoCompleteData.where((word) {
+                //       //   // return word.toLowerCase().contains(textEditingValue.text.toLowerCase());
+                //       //   return word.city.toString().contains(textEditingValue.text.toLowerCase());
+                //       // });
+                //       return autoCompleteData.where((Customer option) {
+                //         return option.toString().contains(
+                //               textEditingValue.text.toLowerCase(),
+                //             );
+                //       });
+                //     }
+                //   },
+                //   onSelected: (Customer selection) {
+                //     debugPrint('Opcao selecionada:  $selection');
 
-                      return autoCompleteData.where((word) {
-                        return word.toLowerCase().contains(textEditingValue.text.toLowerCase());
-                      });
-                    }
-                  },
-                  onSelected: (String selection) {
-                    debugPrint('Opcao selecionada:  $selection');
+                //     // print(copyListData.isNotEmpty ? 1 : 0);
+                //     // setState(() {
+                //     //   // copyListData = ['Serra', 'Vitoria', 'Cariacica'];
+                //     // });
+                //   },
+                //   fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
+                //     this.controller = controller;
 
-                    print(copyListData.isNotEmpty ? 1 : 0);
-                    setState(() {
-                      copyListData = ['Serra', 'Vitoria', 'Cariacica'];
-                    });
-                  },
-                  fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-                    this.controller = controller;
+                //     return TextField(
+                //       controller: controller,
+                //       focusNode: focusNode,
+                //       onEditingComplete: onEditingComplete,
+                //       decoration: InputDecoration(
+                //         border: OutlineInputBorder(
+                //           borderRadius: BorderRadius.circular(8),
+                //           borderSide: BorderSide(color: Colors.grey[300]!),
+                //         ),
+                //         focusedBorder: OutlineInputBorder(
+                //           borderRadius: BorderRadius.circular(8),
+                //           borderSide: BorderSide(color: Colors.grey[300]!),
+                //         ),
+                //         enabledBorder: OutlineInputBorder(
+                //           borderRadius: BorderRadius.circular(8),
+                //           borderSide: BorderSide(color: Colors.grey[300]!),
+                //         ),
+                //         hintText: "Informe o nome da cidade",
+                //         prefixIcon: Icon(Icons.search),
+                //       ),
+                //     );
+                //   },
+                //   optionsViewBuilder: (context, Function(Customer) onSelected, options) {
+                //     return Card(
+                //       elevation: 4,
+                //       child: ListView.separated(
+                //         padding: EdgeInsets.zero,
+                //         itemBuilder: (context, index) {
+                //           final option = options.elementAt(index);
 
-                    return TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      onEditingComplete: onEditingComplete,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey[300]!),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey[300]!),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: Colors.grey[300]!),
-                        ),
-                        hintText: "Informe o nome da cidade",
-                        prefixIcon: Icon(Icons.search),
-                      ),
-                    );
-                  },
-                  optionsViewBuilder: (context, Function(String) onSelected, options) {
-                    return Card(
-                      elevation: 4,
-                      child: ListView.separated(
-                        padding: EdgeInsets.zero,
-                        itemBuilder: (context, index) {
-                          final option = options.elementAt(index);
-
-                          return ListTile(
-                            // title: Text(option.toString()),
-                            title: Text(option.toString()),
-                            // subtitle: Text("This is subtitle"),
-                            onTap: () {
-                              onSelected(option.toString());
-                            },
-                          );
-                          // Widget _createSectionContainer(Widget child) {
-                        },
-                        separatorBuilder: (context, index) => Divider(),
-                        itemCount: options.length,
-                      ),
-                    );
-                  },
-                ),
+                //           return ListTile(
+                //             // title: Text(option.toString()),
+                //             title: Text(option.toString()),
+                //             // subtitle: Text("This is subtitle"),
+                //             onTap: () {
+                //               onSelected(option);
+                //             },
+                //           );
+                //           // Widget _createSectionContainer(Widget child) {
+                //         },
+                //         separatorBuilder: (context, index) => Divider(),
+                //         itemCount: options.length,
+                //       ),
+                //     );
+                //   },
+                // ),
               ],
             ),
+          ),
+          /* 
+            late List<String>   citys        = widget.listCitys;
+          late List<String>   neighborhood = widget.listNeighborhood;
+          */
+          Text(
+            "CIDADES",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.red),
           ),
           Expanded(
             child: SingleChildScrollView(
               child: ListView.separated(
                 // itemCount: widget.listData.length,
-                itemCount: copyListData.length,
+                itemCount: citys.length,
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(copyListData[index]),
+                    title: Text(
+                      citys[index],
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
                   );
+                },
+                separatorBuilder: (BuildContext context, int index) => Divider(
+                  thickness: 1,
+                ),
+              ),
+            ),
+          ),
+          Text(
+            "BAIRRO",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.red),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: ListView.separated(
+                // itemCount: widget.listData.length,
+                itemCount: neighborhood.length,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return ListTile(
+                      title: Text(
+                    neighborhood[index],
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ));
                 },
                 separatorBuilder: (BuildContext context, int index) => Divider(
                   thickness: 1,
