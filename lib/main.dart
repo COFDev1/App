@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:newapp/view/teste.dart';
 import 'package:provider/provider.dart';
 import '/models/protheus.dart';
 import 'view/splash.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         home: Splash(),
+        // home: CheckboxListTileExample(),
         routes: {},
         debugShowCheckedModeBanner: false,
       ),

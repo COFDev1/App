@@ -32,9 +32,8 @@ class _ListCustomersState extends State<ListCustomers> {
   List<Customer> copyListCustomers = [];
   List<String> listNeighborhood = [];
   List<String> listCitys = [];
-
-  var _itemSelecionado = 'Nome';
-  SingingCharacter? _character = SingingCharacter.lafayette;
+  Map<String, bool> chechedCits = {};
+  Map<String, bool> checkedNeighborhood = {};
 
   Future<List<Customer>>? futureCustomers;
 
@@ -52,7 +51,6 @@ class _ListCustomersState extends State<ListCustomers> {
   void _filter(String valueSearch) {
     List<Customer> results = [];
 
-    print('Valor selecionado $_itemSelecionado');
     if (valueSearch.isEmpty) {
       results = copyListCustomers;
     } else {
@@ -97,84 +95,6 @@ class _ListCustomersState extends State<ListCustomers> {
       );
 
   void BottomSheetExample() {
-    const List<String> _userOptions = <String>[
-      'alice',
-      'Bob',
-      'Charlie',
-      'Tatu',
-      'Marta',
-      'Maria',
-      'Pedro',
-      'Amanda',
-      'Joao',
-      'Antonia',
-      'Sandra',
-      'Jose',
-      'Rose',
-      'Roberta',
-      'Aline',
-    ];
-    late final nameController = TextEditingController(text: "TEST");
-    List<List<String>> listsData = [
-      ['Item 1', 'Item 2', 'Item 3'],
-      ['Item A', 'Item B', 'Item C', 'Item D'],
-      ['Item X', 'Item Y', 'Item Z'],
-      ['Item P', 'Item Q', 'Item R'],
-      ['Item M', 'Item N', 'Item O'],
-    ];
-
-    bool checkboxValue2 = true;
-
-    // showModalBottomSheet(
-    //   context: context,
-    //   isScrollControlled: true,
-    //   constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
-    //   shape: const RoundedRectangleBorder(
-    //     borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-    //   ),
-    //   builder: (context) {
-    //     return DraggableScrollableSheet(
-    //       builder: (context, scrollController) {
-    //         return Column(
-    //           children: [
-    //             // ListView.builder(
-    //             //   itemCount: 32,
-    //             //   controller: scrollController,
-    //             //   itemBuilder: (context, index) => ListTile(
-    //             //     title: Text(index.toString()),
-    //             //     onTap: () => Navigator.pop(context),
-    //             //   ),
-    //             // ),
-    //             Text("Teste"),
-    //             CheckboxListTile(
-    //               value: checkboxValue2,
-    //               onChanged: (bool? value) {
-    //                 setState(() {
-    //                   checkboxValue2 = value!;
-    //                   print('Valor atual $checkboxValue2');
-    //                 });
-    //               },
-    //               title: const Text('Headline'),
-    //               subtitle: const Text(
-    //                 'Longer supporting text to demonstrate how the text wraps and the checkbox is centered vertically with the text.',
-    //               ),
-    //             ),
-    //           ],
-    //         );
-    //       },
-    //     );
-    //   },
-    // );
-
-    // showModalBottomSheet(
-    //   isScrollControlled: true,
-    //   // isDismissible: true,
-    //   backgroundColor: Colors.transparent,
-    //   context: context,
-    //   // builder: (context) => _showModalBottomSheet(),
-    //   builder: (context) => CardList(listData: _userOptions),
-    // );
-
     showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
@@ -186,9 +106,10 @@ class _ListCustomersState extends State<ListCustomers> {
         listData: listCustomers,
         listCitys: listCitys,
         listNeighborhood: listNeighborhood,
+        checkNeighborhood: checkedNeighborhood,
       ),
     ).then((onValue) {
-      print('Resultado $onValue');
+      print('Resultado $checkedNeighborhood');
     });
   }
 
@@ -223,11 +144,13 @@ class _ListCustomersState extends State<ListCustomers> {
           ),
         );
 
-        if (listNeighborhood.indexWhere((x) => x.toUpperCase() == element["bairro"].toUpperCase()) < 0) {
-          listNeighborhood.add(element["bairro"].toUpperCase());
-        }
         if (listCitys.indexWhere((x) => x.toUpperCase() == element["municipio"].toUpperCase()) < 0) {
           listCitys.add(element["municipio"].toUpperCase());
+          chechedCits['checked${listCitys.length - 1}'] = false;
+        }
+        if (listNeighborhood.indexWhere((x) => x.toUpperCase() == element["bairro"].toUpperCase()) < 0) {
+          listNeighborhood.add(element["bairro"].toUpperCase());
+          checkedNeighborhood['checked${listNeighborhood.length - 1}'] = false;
         }
       });
 

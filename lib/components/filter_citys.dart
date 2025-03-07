@@ -5,11 +5,13 @@ class CardList extends StatefulWidget {
   final List<Customer> listData;
   final List<String> listCitys;
   final List<String> listNeighborhood;
+  final Map<String, bool> checkNeighborhood;
 
   CardList({
     required this.listData,
     required this.listCitys,
     required this.listNeighborhood,
+    required this.checkNeighborhood,
   });
 
   @override
@@ -18,13 +20,17 @@ class CardList extends StatefulWidget {
 
 class _CardListState extends State<CardList> {
   bool isLoading = false;
+  bool _isChecked = true;
 
   late List<Customer> autoCompleteData = widget.listData;
   late List<Customer> copyListData = widget.listData;
   late List<String> citys = widget.listCitys;
   late List<String> neighborhood = widget.listNeighborhood;
+  late Map<String, bool> markNeighborhood = widget.checkNeighborhood;
 
   late TextEditingController controller;
+
+  late final Map<String, bool> _map = {};
 
   Widget setFieldSearch() {
     return TextField(
@@ -65,113 +71,29 @@ class _CardListState extends State<CardList> {
 //     );
 //   }
 
-  static String _displayStringForOption(Customer option) => option.city;
+  void _onCheckboxChanged(String key, bool? value) {
+    setState(() {
+      print('Chave: $key Valor: $value');
+      markNeighborhood[key] = value!;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    print('Itens passados: $autoCompleteData');
-
     return Card(
       margin: EdgeInsets.all(10.0),
       child: Column(
         children: [
-          // Text(
-          //   "Informe a Cidade e o Bairro",
-          //   style: TextStyle(
-          //     fontWeight: FontWeight.bold,
-          //     fontSize: 16,
-          //     color: Colors.black,
-          //   ),
-          // ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                // Autocomplete<Customer>(
-                //   // displayStringForOption: _displayStringForOption,
-                //   displayStringForOption: _displayStringForOption,
-                //   optionsBuilder: (TextEditingValue textEditingValue) {
-                //     if (textEditingValue.text.isEmpty) {
-                //       return const Iterable<Customer>.empty();
-                //     } else {
-                //       // return autoCompleteData.where((word) {
-                //       //   // return word.toLowerCase().contains(textEditingValue.text.toLowerCase());
-                //       //   return word.city.toString().contains(textEditingValue.text.toLowerCase());
-                //       // });
-                //       return autoCompleteData.where((Customer option) {
-                //         return option.toString().contains(
-                //               textEditingValue.text.toLowerCase(),
-                //             );
-                //       });
-                //     }
-                //   },
-                //   onSelected: (Customer selection) {
-                //     debugPrint('Opcao selecionada:  $selection');
-
-                //     // print(copyListData.isNotEmpty ? 1 : 0);
-                //     // setState(() {
-                //     //   // copyListData = ['Serra', 'Vitoria', 'Cariacica'];
-                //     // });
-                //   },
-                //   fieldViewBuilder: (context, controller, focusNode, onEditingComplete) {
-                //     this.controller = controller;
-
-                //     return TextField(
-                //       controller: controller,
-                //       focusNode: focusNode,
-                //       onEditingComplete: onEditingComplete,
-                //       decoration: InputDecoration(
-                //         border: OutlineInputBorder(
-                //           borderRadius: BorderRadius.circular(8),
-                //           borderSide: BorderSide(color: Colors.grey[300]!),
-                //         ),
-                //         focusedBorder: OutlineInputBorder(
-                //           borderRadius: BorderRadius.circular(8),
-                //           borderSide: BorderSide(color: Colors.grey[300]!),
-                //         ),
-                //         enabledBorder: OutlineInputBorder(
-                //           borderRadius: BorderRadius.circular(8),
-                //           borderSide: BorderSide(color: Colors.grey[300]!),
-                //         ),
-                //         hintText: "Informe o nome da cidade",
-                //         prefixIcon: Icon(Icons.search),
-                //       ),
-                //     );
-                //   },
-                //   optionsViewBuilder: (context, Function(Customer) onSelected, options) {
-                //     return Card(
-                //       elevation: 4,
-                //       child: ListView.separated(
-                //         padding: EdgeInsets.zero,
-                //         itemBuilder: (context, index) {
-                //           final option = options.elementAt(index);
-
-                //           return ListTile(
-                //             // title: Text(option.toString()),
-                //             title: Text(option.toString()),
-                //             // subtitle: Text("This is subtitle"),
-                //             onTap: () {
-                //               onSelected(option);
-                //             },
-                //           );
-                //           // Widget _createSectionContainer(Widget child) {
-                //         },
-                //         separatorBuilder: (context, index) => Divider(),
-                //         itemCount: options.length,
-                //       ),
-                //     );
-                //   },
-                // ),
-              ],
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              "CIDADES",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: Colors.black,
+              ),
             ),
-          ),
-          /* 
-            late List<String>   citys        = widget.listCitys;
-          late List<String>   neighborhood = widget.listNeighborhood;
-          */
-          Text(
-            "CIDADES",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.red),
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -181,14 +103,26 @@ class _CardListState extends State<CardList> {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(
-                      citys[index],
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                  return
+                      // ListTile(
+                      //   title: Text(
+                      //     citys[index],
+                      //     style: TextStyle(
+                      //       fontWeight: FontWeight.bold,
+                      //       fontSize: 20,
+                      //     ),
+                      //   ),
+                      // );
+                      Column(
+                    children: [
+                      CheckboxListTile(
+                        title: Text(neighborhood[index]),
+                        value: markNeighborhood['checked$index'],
+                        onChanged: (bool? value) {
+                          _onCheckboxChanged('checked$index', value);
+                        },
                       ),
-                    ),
+                    ],
                   );
                 },
                 separatorBuilder: (BuildContext context, int index) => Divider(
@@ -197,26 +131,35 @@ class _CardListState extends State<CardList> {
               ),
             ),
           ),
+          SizedBox(
+            height: 30,
+          ),
           Text(
             "BAIRRO",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.red),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: Colors.black,
+            ),
           ),
           Expanded(
             child: SingleChildScrollView(
               child: ListView.separated(
-                // itemCount: widget.listData.length,
                 itemCount: neighborhood.length,
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
-                  return ListTile(
-                      title: Text(
-                    neighborhood[index],
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-                  ));
+                  return Column(
+                    children: [
+                      CheckboxListTile(
+                        title: Text(neighborhood[index]),
+                        value: markNeighborhood['checked$index'],
+                        onChanged: (bool? value) {
+                          _onCheckboxChanged('checked$index', value);
+                        },
+                      ),
+                    ],
+                  );
                 },
                 separatorBuilder: (BuildContext context, int index) => Divider(
                   thickness: 1,
